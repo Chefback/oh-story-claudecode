@@ -84,7 +84,7 @@ metadata:
 
 各阶段完成后需通过质量检查。具体检查项见 [output-templates.md 质量门控必填字段](references/output-templates.md)。
 
-核心标准详见 [material-decomposition.md 质量标准](references/material-decomposition.md#质量标准)。
+核心标准详见 [material-decomposition.md 质量标准](references/material-decomposition.md)。
 
 ---
 
