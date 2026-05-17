@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.7.0
+
+> PPT 产线思路统一 — 理论锚点 + 文件系统 + 准备层
+
+### 新功能
+
+- 新增 **production-line.md** 产线理论锚点文件（双 skill 共享）：PPT 5 核心概念（套路=情绪满足、爆款逆向、剧情模块化、状态分层、人机协同）+ 参考文件映射 + 跨项目资源设计方向
+- 新增 **state-tracking.md** 状态追踪协议文件（双 skill 共享）：最简记忆包提取逻辑（当前状态/历史因果/世界约束）+ 角色状态快照格式
+
+### 改进
+
+- **story-long-write SKILL.md**：
+  - Phase 1-5 标题后添加 PPT 产线映射注释行
+  - 文件结构图升级：`对标/` 新增角色/剧情/设定结构化子目录；`追踪/` 新增 `角色状态.md`
+  - Artifact 映射表新增 4 行（角色状态、对标角色/剧情/设定）
+  - 单章写作 step 2 上下文读取从 7 扩展到 11 个文件源（含 `拆文库/` 回退路径）
+  - Steps 3/3.5/3.7 替换为准备层 3.1（状态筛选）+ 3.2（模块召回）+ 3.3（指令确认）
+  - 步骤重编号 1-10 连续无跳跃
+  - narrative-writer prompt 注入准备层输出
+  - Step 9（更新追踪）新增 `角色状态.md` 更新
+  - Phase 2/3/4 参考资料索引新增 production-line.md 和 state-tracking.md
+- **story-short-write SKILL.md**：
+  - 创作三检替换为 2 步准备层（记忆+召回 / 指令确认）
+  - Phase 3 前新增简化文件结构说明
+  - Phase 2 内联引用 production-line.md
+  - 参考资料表新增 production-line.md 和 state-tracking.md
+
+### 文档
+
+- README.md / README_EN.md 项目文件结构同步更新（长篇对标/追踪、短篇结构、拆文库说明）
+
 ## v0.6.3
 
 > 引用完整性修复 + CI static-check 增强
