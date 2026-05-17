@@ -4,11 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## v0.7.0
 
-> PPT 产线思路统一 — 理论锚点 + 文件系统 + 准备层
+> 产线思路统一 — 核心思路 + 文件系统 + 准备层
 
 ### 新功能
 
-- 新增 **production-line.md** 产线理论锚点文件（双 skill 共享）：PPT 5 核心概念（套路=情绪满足、爆款逆向、剧情模块化、状态分层、人机协同）+ 参考文件映射 + 跨项目资源设计方向
+- 新增 **production-line.md** 产线核心思路文件（双 skill 共享）：PPT 5 核心概念（套路=情绪满足、爆款逆向、剧情模块化、状态分层、人机协同）+ 参考文件映射 + 跨项目资源设计方向
 - 新增 **state-tracking.md** 状态追踪协议文件（双 skill 共享）：最简记忆包提取逻辑（当前状态/历史因果/世界约束）+ 角色状态快照格式
 
 ### 改进

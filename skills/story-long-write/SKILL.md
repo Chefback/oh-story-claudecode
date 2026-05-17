@@ -365,7 +365,7 @@ metadata:
 | 设计关系 | `references/character-relations.md` |
 | 题材框架与定位 | `references/genre-catalog.md` + `references/genre-core-mechanics.md` |
 | 创建 artifact | `references/artifact-protocols.md` |
-| 产线理论锚点 | `references/production-line.md` |
+| 产线核心思路 | `references/production-line.md` |
 
 ### Phase 3：大纲搭建
 
@@ -381,7 +381,7 @@ metadata:
 | 黄金三章 | `references/opening-design.md` |
 | 情绪弧线 | `references/emotional-arc-design.md` |
 | 反转设计 | `references/reversal-toolkit.md` |
-| 产线理论锚点 | `references/production-line.md` |
+| 产线核心思路 | `references/production-line.md` |
 
 ### Phase 4：正文写作
 

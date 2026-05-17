@@ -98,7 +98,7 @@ metadata:
 
 #### 设计任务（框架确定后执行）
 
-详细步骤和模板见 `references/writing-workflow.md`，产线理论锚点见 `references/production-line.md`。按顺序完成：
+详细步骤和模板见 `references/writing-workflow.md`，产线核心思路见 `references/production-line.md`。按顺序完成：
 
 1. 设计结构物件（1-2 个）→ 加载 `writing-craft.md`
 2. 设计反派（如有）→ 加载 `villain-and-reveal.md`
@@ -333,7 +333,7 @@ metadata:
 | [references/genre-catalog.md](references/genre-catalog.md) | 题材框架 |
 | [references/genre-core-mechanics.md](references/genre-core-mechanics.md) | 核心梗设计 |
 | [references/genre-readers.md](references/genre-readers.md) | 读者心理 |
-| [references/production-line.md](references/production-line.md) | 产线理论锚点（Phase 2 构思参考） |
+| [references/production-line.md](references/production-line.md) | 产线核心思路（Phase 2 构思参考） |
 | [references/state-tracking.md](references/state-tracking.md) | 状态追踪协议（Phase 3 准备层参考） |
 
 ---
