@@ -209,6 +209,17 @@ The file system separates settings, outlines, prose, and tracking into independe
 │   └── {topic}.md           # Split by research topic
 ```
 
+**Short-form file structure:**
+
+```
+{Book Title}/
+├── Prose.md                  # Complete short-form prose
+├── Section_outline.md        # Per-section outline (emotion + hooks + events)
+├── Self-check.md             # Post-writing self-check record
+└── References/               # Writing references
+    └── {topic}.md
+```
+
 **Deconstruction Library:** Deconstruction skills save structured outputs (characters, plotlines, settings, chapters) under `拆文库/{Book Title}/` at project root. Writing skills consume these assets through the `Benchmark/` subdirectory, or automatically fall back to reading from the deconstruction library.
 
 ## Knowledge Base

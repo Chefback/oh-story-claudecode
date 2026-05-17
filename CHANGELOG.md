@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## v0.7.0
+## v0.6.4
 
 > 产线思路统一 — 核心思路集成 + 文件系统 + 准备层
 
@@ -34,7 +34,7 @@ All notable changes to this project will be documented in this file.
 
 ### 文档
 
-- README.md / README_EN.md 项目文件结构同步更新（长篇对标/追踪、短篇结构、拆文库说明）
+- README.md 项目文件结构全面更新（长篇对标/追踪、短篇结构、拆文库说明），README_EN.md 长篇结构同步
 
 ## v0.6.3
 
