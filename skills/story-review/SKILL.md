@@ -36,10 +36,10 @@ metadata:
 2. 读取待审查的正文内容
 3. 读取相关的设定文件和大纲
 4. 识别目标平台（检查 `.active-book` 或用户指定），加载对应 rubric：
-   - 番茄小说 → 读取 [references/rubrics/fanqie.md](references/rubrics/fanqie.md)
-   - 起点 → 读取 [references/rubrics/qidian.md](references/rubrics/qidian.md)
-   - 知乎盐言 → 读取 [references/rubrics/zhihu.md](references/rubrics/zhihu.md)
-   - 未指定 → 默认加载 [references/quality-rubric.md](references/quality-rubric.md)
+   - 番茄小说 → 读取 [story-review/references/rubrics/fanqie.md](story-review/references/rubrics/fanqie.md)
+   - 起点 → 读取 [story-review/references/rubrics/qidian.md](story-review/references/rubrics/qidian.md)
+   - 知乎盐言 → 读取 [story-review/references/rubrics/zhihu.md](story-review/references/rubrics/zhihu.md)
+   - 未指定 → 默认加载 [story-review/references/quality-rubric.md](story-review/references/quality-rubric.md)
 
 **Phase 1.5：可选 story-explorer 预查询**。如果项目已部署 story-explorer agent（检查 `.claude/agents/story-explorer.md` 是否存在），可 spawn `Agent(subagent_type: "story-explorer", prompt: "项目目录：{dir}\n查询类型：setting_appearances\n查询参数：{审查涉及的设定关键词}")` 预查设定摘要，将结果注入各 agent 的 prompt，减少重复 grep。此步可选，跳过不影响审查流程。
 
@@ -104,7 +104,7 @@ metadata:
   你是 narrative-writer，从文字质量层面审查以下内容。
   你的任务是【找问题】，不是验证正确性。以最严苛的标准审视。
   审查范围：{待审查内容}
-  禁用词表：references/banned-words.md
+  禁用词表：story-review/references/banned-words.md
   检查项：
   1. 是否存在禁用词/套话/陈词滥调？
   2. 格式是否合规（一段一句、≤60字、无空行、对话独立成行）？
