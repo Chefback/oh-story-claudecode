@@ -27,6 +27,13 @@ const { ab, sleep, evalJSON, scrollLoad, getArg } = require("./cdp-utils");
 
 const BASE_URL = "https://www.qidian.com/rank";
 
+/** 验证码自动重试最大次数 */
+const MAX_CAPTCHA_RETRIES = 3;
+/** 等待用户手动解决验证码的最大秒数 */
+const MAX_CAPTCHA_WAIT_SEC = 120;
+/** 轮询验证码是否解除的间隔（毫秒） */
+const CAPTCHA_POLL_INTERVAL = 5000;
+
 const RANK_TYPES = [
   { id: "hotsales", label: "畅销榜" },
   { id: "yuepiao", label: "月票榜" },
@@ -118,6 +125,79 @@ function extractDetail(port) {
   return evalJSON(port, js);
 }
 
+/**
+ * 检测当前页面是否被验证码/安全验证拦截。
+ * 起点常见拦截页面特征：页面中出现验证码关键词，或页面缺少榜单 DOM 元素。
+ * @returns {{ blocked: boolean, reason: string } | null} 若被拦截返回原因对象，否则 null
+ */
+function isCaptchaPage(port) {
+  const js =
+    "JSON.stringify((()=>{" +
+    "var bodyText=document.body?(document.body.innerText||'').substring(0,3000):'';" +
+    "var lower=bodyText.toLowerCase();" +
+    "var keywords=['验证','captcha','verify','安全验证','滑块','拖动','请完成验证'," +
+    "'混元','人机验证','异常请求','访问验证','操作频繁','请求过于频繁','waf','请稍后再试'];" +
+    "for(var i=0;i<keywords.length;i++){" +
+    "  if(lower.indexOf(keywords[i])>-1){" +
+    "    return {blocked:true,reason:keywords[i]};" +
+    "  }" +
+    "}" +
+    "var hasContent=document.querySelector('.book-img-text ul li,.rank-body,.rank-list,.book-img-text');" +
+    "if(!hasContent){" +
+    "  return {blocked:true,reason:'页面无榜单内容(可能被拦截)'};" +
+    "}" +
+    "return {blocked:false,reason:''};" +
+    "})())";
+  const result = evalJSON(port, js);
+  return result && result.blocked === true ? result : null;
+}
+
+/**
+ * 打开 URL 并等待页面加载，自动处理验证码拦截。
+ * 重试策略：
+ *   1. 正常加载页面
+ *   2. 检测到验证码 → 等待递增延时后刷新重试（最多 MAX_CAPTCHA_RETRIES 次）
+ *   3. 仍被拦截 → 提示用户在 Chrome CDP 窗口手动完成验证，轮询等待直到解除或超时
+ *
+ * @returns {boolean} true=页面已就绪，false=无法通过验证码
+ */
+function openWithCaptchaHandling(port, url) {
+  for (let attempt = 1; attempt <= MAX_CAPTCHA_RETRIES; attempt++) {
+    ab(port, "open", url);
+    // 首次 3 秒，后续每次多等 2 秒
+    sleep(3000 + (attempt - 1) * 2000);
+
+    const captcha = isCaptchaPage(port);
+    if (!captcha) {
+      return true; // 页面正常
+    }
+    console.log(`  ⚠ 检测到安全拦截 (${captcha.reason})，第 ${attempt}/${MAX_CAPTCHA_RETRIES} 次重试...`);
+    // 递增等待后再次尝试
+    sleep(attempt * 5000);
+  }
+
+  // 自动重试全部失败 → 等待用户手动处理
+  console.log(`  ⚠ 自动重试未通过验证码，请在 Chrome CDP 窗口手动完成验证`);
+  console.log(`  ⏳ 等待手动验证（最长 ${MAX_CAPTCHA_WAIT_SEC} 秒）...`);
+
+  const startTime = Date.now();
+  while (Date.now() - startTime < MAX_CAPTCHA_WAIT_SEC * 1000) {
+    sleep(CAPTCHA_POLL_INTERVAL);
+    // 刷新页面检查验证码是否已解除
+    ab(port, "open", url);
+    sleep(3000);
+    const captcha = isCaptchaPage(port);
+    if (!captcha) {
+      console.log(`  ✓ 验证码已解除，继续采集`);
+      return true;
+    }
+    const elapsed = Math.round((Date.now() - startTime) / 1000);
+    process.stdout.write(`  等待中... (${elapsed}s)\r`);
+  }
+  console.log(`  ✗ 等待超时，验证码仍未解除`);
+  return false;
+}
+
 // ---------------------------------------------------------------------------
 // 主流程
 // ---------------------------------------------------------------------------
@@ -139,8 +219,13 @@ function scrapeRank(port, rankTypeId) {
   console.log(`\n→ 采集 起点${rt.label}...`);
   console.log(`  URL: ${url}`);
 
-  ab(port, "open", url);
-  sleep(3000);
+  // 使用带验证码处理的页面打开
+  const pageReady = openWithCaptchaHandling(port, url);
+  if (!pageReady) {
+    console.log(`  ✗ 起点采集失败：页面无法通过验证码拦截`);
+    return null;
+  }
+
   scrollLoad(port, 3);
   sleep(1000);
 
