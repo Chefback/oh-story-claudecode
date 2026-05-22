@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### Bug 修复
+
+- 修复 story-review 子 Agent 读取 `quality-checklist.md` 等参考文件时按当前目录解析导致找不到的问题：story-review prompt 与 story-setup Agent 模板统一使用 skill-relative 规范路径，并将 `agents_version` 升级到 v8 以提示既有项目重新部署。
+
+### 验证
+
+- story-review / story-setup Agent 模板路径审计通过。
+- `bash scripts/static-check.sh`
+
 ## v0.6.7
 
 > 拆书 skill 重构：长篇双模式合并 + 短篇去模式化
