@@ -85,5 +85,5 @@
 ### v8 (当前)
 
 - 修复 story-review 及部署后的 reviewer Agent 在项目根目录下读取参考文件时，只找裸文件名（如 `quality-checklist.md`）导致找不到 skill references 的问题。
-- Agent 模板新增参考文件路径规则：优先从 `.claude/skills/` 或 `skills/` 下解析 `story-*/references/*.md` 规范路径，避免依赖当前工作目录。
+- Agent 模板新增参考文件路径规则：优先从 `.claude/skills/` 或 `skills/` 拼接解析 `story-setup/references/agent-references/*.md` 规范路径，避免依赖当前工作目录且不跨 skill 引用 references。
 - 已部署项目需重新运行 `/story-setup`，以覆盖 `.claude/agents/` 并获得新版参考文件路径规则。

@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Bug 修复
 
-- 修复 story-review 子 Agent 读取 `quality-checklist.md` 等参考文件时按当前目录解析导致找不到的问题：story-review prompt 与 story-setup Agent 模板统一使用 skill-relative 规范路径，并将 `agents_version` 升级到 v8 以提示既有项目重新部署。
+- 修复 story-review 子 Agent 读取 `quality-checklist.md` 等参考文件时按当前目录解析导致找不到的问题：story-review prompt 与 story-setup Agent 模板统一使用本 skill 内复制的 references 规范路径，并将 `agents_version` 升级到 v8 以提示既有项目重新部署。
 
 ### 验证
 

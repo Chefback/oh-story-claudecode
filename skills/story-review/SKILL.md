@@ -30,26 +30,27 @@ metadata:
 
 ## 参考文件路径规则（必须遵守）
 
-story-review 会把参考资料交给子 Agent。**所有传给 Agent 的参考文件必须使用可从项目根或 skills 安装目录解析的路径，禁止只写裸文件名。**
+story-review 会把参考资料交给子 Agent。**所有传给 Agent 的参考文件必须使用本 skill 内的规范路径，禁止只写裸文件名，也禁止跨 skill 引用其他 skill 的 references。**
 
 路径解析顺序：
-1. `{项目根}/.claude/skills/{skill-name}/...`（Claude Code / OpenClaw 项目内安装）
-2. `{项目根}/skills/{skill-name}/...`（本仓库开发环境）
-3. 工具自身的全局 skill 搜索路径
+1. `{项目根}/.claude/skills/{规范路径}`（Claude Code / OpenClaw 项目内安装）
+2. `{项目根}/skills/{规范路径}`（本仓库开发环境）
+3. 工具自身的全局 skill 搜索路径中同名 `{skill-name}/...` 目录
 
 传给 Agent 时使用如下规范路径，并明确要求 Agent 不要读取裸文件名：
 
 | 用途 | 规范路径 |
 |---|---|
-| 通用质量清单 | `story-long-write/references/quality-checklist.md` |
-| 剧情循环/高潮公式 | `story-long-write/references/plot-core-methods.md` |
-| 角色关系/好感度 | `story-long-write/references/character-relations.md` |
-| 对话质量 | `story-long-write/references/dialogue-mastery.md` |
+| 通用质量清单 | `story-review/references/quality-checklist.md` |
+| 去 AI 味方法 | `story-review/references/anti-ai-writing.md` |
+| 剧情循环/高潮公式 | `story-review/references/plot-core-methods.md` |
+| 角色关系/好感度 | `story-review/references/character-relations.md` |
+| 对话质量 | `story-review/references/dialogue-mastery.md` |
 | 审查禁用词 | `story-review/references/banned-words.md` |
 | 默认 rubric | `story-review/references/quality-rubric.md` |
 | 平台 rubric | `story-review/references/rubrics/{fanqie,qidian,zhihu}.md` |
 
-如果某工具只接受当前目录相对路径，先检查 `.claude/skills/` 和 `skills/` 下的完整路径；找不到再用 Glob/Grep 搜索 `*/{skill-name}/references/{file}`。
+如果某工具只接受当前目录相对路径，先尝试 `.claude/skills/story-review/references/{file}` 和 `skills/story-review/references/{file}`；找不到再用 Glob/Grep 搜索 `*/story-review/references/{file}`；禁止改读其他 skill 的 references。
 
 ## Phase 1：收集待审查内容
 
@@ -81,16 +82,16 @@ story-review 会把参考资料交给子 Agent。**所有传给 Agent 的参考�
   审查范围：{待审查内容}
   平台评分标准：{Phase 1 加载的 rubric 内容}
   相关文件路径：{设定/大纲/细纲文件路径}
-  参考文件路径规则：优先从 `{项目根}/.claude/skills/` 或 `{项目根}/skills/` 解析以下规范路径；不要读取裸文件名。
-  参考文件：`story-long-write/references/quality-checklist.md`、`story-long-write/references/plot-core-methods.md`、`story-review/references/rubrics/{平台}.md`
+  参考文件路径规则：以下路径以 skill 名开头；优先从 `{项目根}/.claude/skills/` 或 `{项目根}/skills/` 拼接解析；不要读取裸文件名，不要跨 skill 读取 references。
+  参考文件：`story-review/references/quality-checklist.md`、`story-review/references/plot-core-methods.md`、`story-review/references/rubrics/{平台}.md`
   检查项：
   1. 这一章是否推进了故事主题？
   2. 大纲结构是否完整（钩子/爽点/悬念）？
   3. 情绪节奏是否合理？
   4. 钩子和反转设计质量如何？
   5. 范围控制：有无角色/设定膨胀？
-  6. 剧情循环是否存在且可重复？（参见 `story-long-write/references/plot-core-methods.md` 的「卡文对策与剧情循环设计」）
-  7. 高潮场景是否用了蓄能→假胜→崩解结构？（参见 `story-long-write/references/plot-core-methods.md` 的「高潮构建公式」）
+  6. 剧情循环是否存在且可重复？（参见 `story-review/references/plot-core-methods.md` 的「卡文对策与剧情循环设计」）
+  7. 高潮场景是否用了蓄能→假胜→崩解结构？（参见 `story-review/references/plot-core-methods.md` 的「高潮构建公式」）
   8. 按平台 rubric 逐项对照，标记 PASS/FAIL
 
   输出格式：
@@ -107,15 +108,15 @@ story-review 会把参考资料交给子 Agent。**所有传给 Agent 的参考�
   你的任务是【找问题】，不是验证正确性。以最严苛的标准审视。
   审查范围：{待审查内容}
   相关角色文件：{角色设定文件路径}
-  参考文件路径规则：优先从 `{项目根}/.claude/skills/` 或 `{项目根}/skills/` 解析以下规范路径；不要读取裸文件名。
-  参考文件：`story-long-write/references/character-relations.md`、`story-long-write/references/dialogue-mastery.md`
+  参考文件路径规则：以下路径以 skill 名开头；优先从 `{项目根}/.claude/skills/` 或 `{项目根}/skills/` 拼接解析；不要读取裸文件名，不要跨 skill 读取 references。
+  参考文件：`story-review/references/character-relations.md`、`story-review/references/dialogue-mastery.md`
   检查项：
   1. 角色语言风格是否与语言风格档案一致？
   2. 对话是否千篇一律（AI味）？
   3. 人物弧线是否连贯？
   4. 角色行为是否符合其动机？
   5. 对话是否有潜台词和信息控制？
-  6. 爱情线好感度与CP行为是否匹配？（参见 `story-long-write/references/character-relations.md` 的「好感度体系」）
+  6. 爱情线好感度与CP行为是否匹配？（参见 `story-review/references/character-relations.md` 的「好感度体系」）
   7. 好感度进度是否可感知？
 
   输出格式：
@@ -131,9 +132,9 @@ story-review 会把参考资料交给子 Agent。**所有传给 Agent 的参考�
   你是 narrative-writer，从文字质量层面审查以下内容。
   你的任务是【找问题】，不是验证正确性。以最严苛的标准审视。
   审查范围：{待审查内容}
-  参考文件路径规则：优先从 `{项目根}/.claude/skills/` 或 `{项目根}/skills/` 解析以下规范路径；不要读取裸文件名。
+  参考文件路径规则：以下路径以 skill 名开头；优先从 `{项目根}/.claude/skills/` 或 `{项目根}/skills/` 拼接解析；不要读取裸文件名，不要跨 skill 读取 references。
   禁用词表：`story-review/references/banned-words.md`
-  质量清单：`story-long-write/references/quality-checklist.md`
+  质量清单：`story-review/references/quality-checklist.md`
   检查项：
   1. 是否存在禁用词/套话/陈词滥调？
   2. 格式是否合规（一段一句、≤60字、无空行、对话独立成行）？
@@ -156,8 +157,8 @@ story-review 会把参考资料交给子 Agent。**所有传给 Agent 的参考�
   审查范围：{待审查内容}
   已知角色：{从设定文件提取角色列表}
   项目路径：{工作目录路径，用于 grep 扫描}
-  参考文件路径规则：优先从 `{项目根}/.claude/skills/` 或 `{项目根}/skills/` 解析以下规范路径；不要读取裸文件名。
-  质量清单：`story-long-write/references/quality-checklist.md`
+  参考文件路径规则：以下路径以 skill 名开头；优先从 `{项目根}/.claude/skills/` 或 `{项目根}/skills/` 拼接解析；不要读取裸文件名，不要跨 skill 读取 references。
+  质量清单：`story-review/references/quality-checklist.md`
   检查项：
   1. 角色属性是否前后一致？
   2. 世界规则是否被违反？

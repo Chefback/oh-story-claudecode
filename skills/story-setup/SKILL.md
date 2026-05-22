@@ -57,7 +57,7 @@ metadata:
 
 ### 2.4.1 Agent 兼容性处理
 - Agent frontmatter 以 Claude Code 为主；OpenClaw/qclaw 等只要支持 AgentSkills，未知字段（如 `memory`、`skills`、`disallowedTools`）应被忽略。若目标工具报 frontmatter 错误，保留 `name`、`description`、`tools` 三项，删除不支持字段后再部署。
-- 部署到项目后，agent 内引用的 `story-*/references/*.md` 需要能从项目根或 skills 安装目录检索到；若全局安装路径不同，优先用项目内 skills 路径，其次用工具的 skill 搜索能力，不要假定固定绝对路径。
+- 部署到项目后，agent 内引用的参考资料必须走 `story-setup/references/agent-references/*.md` 这一本 skill 内复制路径；不要跨 skill 引用其他 skill 的 references。若全局安装路径不同，优先用项目内 `.claude/skills/` 或 `skills/` 作为规范路径前缀，其次用工具的 skill 搜索能力，不要假定固定绝对路径。
 
 ### 2.5 部署 Session State 模板
 - 读取 `skills/story-setup/references/templates/上下文.md.tmpl`
@@ -149,6 +149,7 @@ hooks 注册合并按 command 字段去重：
 | references/templates/hooks/ | 6 个 hook 脚本模板 |
 | references/templates/rules/ | 4 条 path-scoped 规则模板 |
 | references/templates/agents/ | 7 个 agent 定义模板（story-architect, character-designer, narrative-writer, consistency-checker, story-researcher, story-explorer, chapter-extractor） |
+| references/agent-references/ | Agent 模板自带的参考资料副本；模板只引用本目录，避免跨 skill references |
 | references/templates/settings-hooks.json | hooks 注册 JSON 片段 |
 | references/templates/上下文.md.tmpl | 写作上下文模板 |
 
