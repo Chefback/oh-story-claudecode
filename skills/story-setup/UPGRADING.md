@@ -102,3 +102,5 @@
 - 新增贡献者脚本：`scripts/dev-setup.sh`（worktree 内一键渲染 21 refs + 7 agents）+ `scripts/install-hooks.sh`（设置 `core.hooksPath`）。
 
 OpenClaw / 其他非 claude-code CLI 的兼容性 spike 推迟到 v10；当前 v9 默认 `target_cli=claude-code`，details 见 `.omc/notes/openclaw-spike.md`。
+
+> **注意**：v0.8.0 release 同时升级 `story-review` skill 到 v1.1.0（双 Pass 架构 + reframe preamble，针对 issue #88）。已部署项目必须**同时**重跑 `/story-setup` 拿到 v9 agent 模板的 reframe preamble，否则 `/story-review` 仍走旧路径。详见 `skills/story-review/UPGRADING.md`。

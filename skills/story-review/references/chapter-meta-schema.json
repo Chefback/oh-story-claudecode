@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/worldwonderer/oh-story-claudecode/blob/main/skills/story-review/references/chapter-meta-schema.json",
+  "title": "CHAPTER_META v1.0",
+  "description": "Structured per-chapter review intermediate. Emitted by every Pass 1 (local) agent in /story-review alongside its natural-language FINDINGS. Aggregated by scripts/aggregate-review.sh in Pass 2 for cumulative-pattern detection. The whole-prose load is never reconstituted from CHAPTER_META — this schema is the cumulative-review contract.",
+  "type": "object",
+  "required": ["chapter_id", "verdict", "ai_grade", "schema_version"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Pinned to '1.0' for this release. Future bumps require story-review version bump."
+    },
+    "chapter_id": {
+      "type": "string",
+      "description": "Stable identifier for the chapter. Recommended: file path relative to project root (e.g., '《书名》/正文/第241章_审判庭.md') or canonical chapter number ('第241章'). Must match across all agents reviewing the same chapter."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["APPROVE", "CONCERNS", "REJECT"],
+      "description": "This agent's verdict on the chapter (mirrors the agent's natural-language VERDICT)."
+    },
+    "ai_grade": {
+      "type": "string",
+      "enum": ["light", "medium", "heavy"],
+      "description": "Subjective AI-tone severity for THIS chapter. Only narrative-writer is expected to fill meaningfully; other agents may pass-through 'light' if outside their scope."
+    },
+    "banned_words_found": {
+      "type": "array",
+      "description": "Banned-words-table matches found in the chapter, with per-word counts.",
+      "items": {
+        "type": "object",
+        "required": ["word", "count"],
+        "additionalProperties": false,
+        "properties": {
+          "word": {"type": "string"},
+          "count": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "body_parts_used": {
+      "type": "array",
+      "description": "Body-part word frequency in this chapter (for cross-chapter saturation detection). Same word from quality-checklist 'same body word > 5 times' rule.",
+      "items": {
+        "type": "object",
+        "required": ["word", "count"],
+        "additionalProperties": false,
+        "properties": {
+          "word": {"type": "string"},
+          "count": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "rhythm_tags": {
+      "type": "array",
+      "description": "Coarse pacing tags for this chapter (multi-tag allowed when chapter has distinct sections).",
+      "items": {
+        "type": "string",
+        "enum": ["low_pressure", "high_pressure", "v_shape", "flat", "escalating", "climax", "denouement"]
+      }
+    },
+    "sentence_pattern_diversity": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Detection of 'all paragraphs follow same SVO loop' AI tells. Low = uniform, high = varied."
+    },
+    "emotional_beats": {
+      "type": "array",
+      "description": "Ordered emotional checkpoints across the chapter. Used by Pass 2 aggregator to render the volume-level emotional arc.",
+      "items": {
+        "type": "object",
+        "required": ["position_pct", "emotion_type"],
+        "additionalProperties": false,
+        "properties": {
+          "position_pct": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Where in the chapter (0=opening, 100=closing) this beat lands."
+          },
+          "emotion_type": {
+            "type": "string",
+            "enum": ["tension", "release", "grief", "anger", "joy", "fear", "shame", "longing", "resolve", "doubt", "betrayal", "reunion", "neutral"]
+          }
+        }
+      }
+    },
+    "s1_count": {"type": "integer", "minimum": 0, "description": "Hard contradictions (S1) flagged by consistency-checker in this chapter — usually 0 in Pass 1 since consistency-checker is not spawned per-chapter."},
+    "s2_count": {"type": "integer", "minimum": 0, "description": "Major issues (S2) flagged in this chapter."},
+    "s3_count": {"type": "integer", "minimum": 0, "description": "Minor issues (S3)."},
+    "s4_count": {"type": "integer", "minimum": 0, "description": "Advisory issues (S4)."},
+    "pov_character": {
+      "type": "string",
+      "description": "Point-of-view character name. Used by Pass 2 to detect POV drift."
+    },
+    "char_drift_flag": {
+      "type": "boolean",
+      "description": "True iff character-designer detected a candidate language-style drift in this chapter (only meaningful at Pass 2 aggregation time)."
+    },
+    "foreshadow_planted": {
+      "type": "array",
+      "description": "伏笔 IDs planted in this chapter (matching 追踪/伏笔.md编号 column, e.g., 'F012').",
+      "items": {"type": "string"}
+    },
+    "foreshadow_resolved": {
+      "type": "array",
+      "description": "伏笔 IDs resolved (called back) in this chapter.",
+      "items": {"type": "string"}
+    }
+  }
+}

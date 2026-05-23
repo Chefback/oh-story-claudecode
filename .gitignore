@@ -8,3 +8,7 @@ CLAUDE.md
 _archive/
 skills-lock.json
 docs/plans/
+
+# bootstrap-tracking transient manifest dir
+追踪/.bootstrap/
+**/追踪/.bootstrap/
