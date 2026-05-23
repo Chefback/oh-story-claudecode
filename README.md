@@ -291,6 +291,15 @@ Agent 按需加载 `references/` 中的写作理论（角色设计、对话技�
 
 欢迎贡献新 skill、补充知识库、更新市场数据。详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
+**开发本仓库前请先跑两步 bootstrap**：
+
+```bash
+bash scripts/dev-setup.sh     # 把 story-setup 的 agent + references 渲染到本地 .claude/
+bash scripts/install-hooks.sh # 启用 pre-commit 校验（路由 schema、canonical 副本等）
+```
+
+`dev-setup.sh` 是幂等的，每次拉取主干后再跑一次即可。
+
 ## License
 
 [MIT](./LICENSE)
