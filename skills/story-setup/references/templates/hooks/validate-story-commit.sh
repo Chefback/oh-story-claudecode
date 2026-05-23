@@ -2,8 +2,11 @@
 # validate-story-commit.sh — 在 git commit 时检查格式问题（WARNING only, no BLOCKING）
 set -euo pipefail
 
-# 仅在 git commit 命令时触发（由 settings.json 的 if 过滤器控制）
-# 其他 Bash 命令不应到达此脚本，但做安全检查
+# Gate: 仅当 settings.json 的 if 过滤器把 git commit 命令传过来时才跑。
+# CLAUDE_TOOL_INPUT 由 PreToolUse hook 提供原始 tool input；不含 "git commit" 视为非目标场景，advisory 退出。
+if [ -z "${CLAUDE_TOOL_INPUT:-}" ] || ! echo "${CLAUDE_TOOL_INPUT}" | grep -q 'git commit'; then
+  exit 0
+fi
 
 WARNINGS=""
 

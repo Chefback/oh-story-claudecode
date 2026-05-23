@@ -7,7 +7,7 @@ source "$(dirname "$0")/lib/common.sh"
 
 echo "=== Pre-Compact Summary ==="
 
-BOOK_DIR=$(discover_book_dir)
+BOOK_DIR=$(discover_active_book)
 
 # 上下文.md 状态摘要（路径 + 行数，不输出内容）
 if [ -n "$BOOK_DIR" ] && [ -f "$BOOK_DIR/追踪/上下文.md" ]; then

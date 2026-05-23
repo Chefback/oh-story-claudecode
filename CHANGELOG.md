@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.7.0
+
+> story-setup v9 — 模板占位符 + 部署时 sed 渲染（breaking change）；hook 兼容 macOS bash 3.2；多本书扫描下沉；story 路由 schema 化
+
+**Breaking change**：v8 用户必须重跑 `/story-setup`，否则 4 个创作型 agent (story-architect / character-designer / narrative-writer / consistency-checker) 读不到 references。一次性升级到 `agents_version: 9` 后才能继续日更。
+
+### 改进
+
+- **story-setup 占位符模型**：4 个 creative agent 模板内 `story-setup/references/agent-references/X.md` 路径替换为 `<<STORY_REF>>/X.md` 占位符。`/story-setup` 部署时 `sed` 把占位符渲染成 `.claude/agent-references/X.md` 的相对路径。三段式 fallback prose 改写为单段 advisory（运行时仍读到裸占位符 → 提示重跑 setup）。
+- **sentinel 结构化**：`.story-deployed` 升级为显式 YAML key:value（grep 仍可读旧字段）；新增 `target_cli`、`resolver_strategy`、`references_dir` 字段。`agents_version` bump 到 `9`。新增 `lib/sentinel.sh::read_sentinel_field`，无 yq 依赖。
+- **多本书扫描下沉**：`lib/common.sh` 拆分为 `discover_active_book`（单本/活跃）+ `discover_all_books`（多本/awk 去重）。`detect-story-gaps` 从 30 行内联 multi-book find 减为一行 `discover_all_books` 调用。
+- **story 路由 schema 化**：`skills/story/SKILL.md` frontmatter 新增 `routes:` YAML 数组（13 条），每条含 intent + triggers + (skill or agent)；body 路由表作为人类可读副本，`scripts/check-story-routes-sync.sh` 校验一致性。description 收窄，避免与子 skill 抢命中。
+- **贡献者 bootstrap**：新增 `scripts/dev-setup.sh`（worktree 内一键渲染 21 refs + 7 agents）+ `scripts/install-hooks.sh`（设置 `core.hooksPath`）。
+- **canonical 副本文档化**：`skills/story-setup/references/agent-references/README.md` 阐明 canonical seed 作用 + sibling 副本独立性约定（clawhub 兼容）。`scripts/check-references-canonical.sh` 输出 advisory drift 报告，不阻塞 CI。
+- **角色模板占位符化**：rules / story-explorer 内硬编码角色名（沈栀/陆衍/林墨）替换为 `{主角名}/{男主名}/{配角名}` 占位符。新增 `角色状态.md.tmpl` + `伏笔.md.tmpl` 空骨架。
+- **hook 性能/打扰收紧**：`validate-story-commit.sh` 顶部 `CLAUDE_TOOL_INPUT` gate，非 `git commit` 直接 exit 0；`session-end.sh` 新增 `STORY_SESSION_LOG=1` 开关，默认禁用 session-log.txt 写入。
+
+### Bug 修复
+
+- **S1 阻塞修复**：`detect-story-gaps.sh` 用数组长度 `[ "${#BOOK_DIRS[@]}" -gt 0 ]` 替代 `${arr[@]+...}`，兼容 macOS `/bin/bash 3.2.57`；删除短篇 if/else dead code；空项目 silent exit 0。
+- **规则冲突修复**：`story-format.md` 删除「章节之间用 `---` 分隔」与 narrative-writer agent「禁止用 `---` 分隔正文片段」冲突的语句。
+- **孤儿归档**：`plot-core-methods.md` 从 canonical agent-references 目录移入 `_attic/`（story-setup agent 模板已不引用）。两个 sibling 副本（story-long-write / story-review）保留。
+
+### 验证
+
+- 端到端 `bash scripts/dev-setup.sh`：21 refs / 7 agents / 0 占位符残留 / 4 creative agents 解析为 `.claude/agent-references/`。
+- `bash scripts/check-story-routes-sync.sh` 正向 exit 0；故意打乱 body 表 exit 1。
+- bash 3.2 fixture：空项目 silent exit 0；多本书 fixture 长篇+短篇缺口都检出。
+- sentinel.sh：6 字段读取 + missing 空值 + sentinel_exists positive/negative 全 PASS。
+
+### 升级
+
+`/story-setup` 重跑会一次性完成迁移；细节见 `skills/story-setup/UPGRADING.md` v9 段。
+
 ## v0.6.8
 
 > story-import 重构 + skill 自包含化 + 起点扫榜与 story-review 子 Agent 修复

@@ -41,7 +41,7 @@ if [ -n "$BRANCH" ]; then
 fi
 
 # 上下文.md 摘要（只看当前位置部分，前 10 行）
-BOOK_DIR=$(discover_book_dir)
+BOOK_DIR=$(discover_active_book)
 if [ -n "$BOOK_DIR" ] && [ -f "$BOOK_DIR/追踪/上下文.md" ]; then
   OUTPUT+="--- 当前位置 ---\n"
   SNAPSHOT=$(head -10 "$BOOK_DIR/追踪/上下文.md")

@@ -43,7 +43,8 @@
 - `agents_version: 5` → 旧版，需重新部署以统一短篇主会话/子代理正文格式
 - `agents_version: 6` → 旧版，需重新部署以获取日更续写与伏笔 hook 修复
 - `agents_version: 7` → 旧版，需重新部署以获取 Agent 参考文件路径修复
-- `agents_version: 8` → 当前版本
+- `agents_version: 8` → 旧版，需重新部署以迁移到 `<<STORY_REF>>` 占位符 + 部署时 sed 渲染
+- `agents_version: 9` → 当前版本
 
 ## 版本变更
 
@@ -82,8 +83,22 @@
 - 修复 `detect-story-gaps.sh` 对伏笔表头和正常开放伏笔（`未埋`/`已埋`）的误报；SessionStart 只提示 `已过期` 或异常状态。
 - 已部署项目需重新运行 `/story-setup`，以覆盖 `.claude/hooks/`、`.claude/agents/`、`.claude/rules/` 并获得新版 hook 行为。
 
-### v8 (当前)
+### v8
 
 - 修复 story-review 及部署后的 reviewer Agent 在项目根目录下读取参考文件时，只找裸文件名（如 `quality-checklist.md`）导致找不到 skill references 的问题。
 - Agent 模板新增参考文件路径规则：优先从 `.claude/skills/` 或 `skills/` 拼接解析 `story-setup/references/agent-references/*.md` 规范路径，避免依赖当前工作目录且不跨 skill 引用 references。
 - 已部署项目需重新运行 `/story-setup`，以覆盖 `.claude/agents/` 并获得新版参考文件路径规则。
+
+### v9 (当前)
+
+**Breaking change：v8 用户必须重跑 `/story-setup`，否则 agent 读不到 references。**
+
+- 路径迁移到模板占位符 + 部署时 resolve：creative agent（story-architect / character-designer / narrative-writer / consistency-checker）模板内所有 `story-setup/references/agent-references/X.md` 路径替换为 `<<STORY_REF>>/X.md`。`/story-setup` 部署时 `sed` 把占位符渲染成 `.claude/agent-references/X.md` 的相对路径。
+- 部署新增 Phase 2.4.2 步骤：把 21 个 references `.md` 复制到项目根目录 `.claude/agent-references/`，然后对 `.claude/agents/` 下所有文件执行 `sed -i.bak 's|<<STORY_REF>>|.claude/agent-references|g'`。
+- Phase 3 新增校验：`grep -rln '<<[A-Z_]+>>' .claude/agents/` 必须输出 0 行；如有残留说明 sed 替换失败。
+- agent 模板内删除三段式 fallback prose（`.claude/skills/` → `skills/` → Glob 搜索），替换为单段 advisory：若运行时仍能读到裸 `<<STORY_REF>>`，说明用户没跑过 setup，提示运行 `bash scripts/dev-setup.sh` 或 `/story-setup`，不要再尝试 fallback 搜索。
+- sentinel `.story-deployed` 新增字段：`target_cli: claude-code`、`resolver_strategy: template-placeholder`、`references_dir: .claude/agent-references`；`agents_version` bump 到 `9`。
+- S1 修复：`detect-story-gaps.sh` 改用数组长度检查兼容 macOS bash 3.2，删除短篇 if/else dead code；`story-format.md` 移除「章节之间用 `---` 分隔」与 narrative-writer 「禁止水平分隔线」的规则矛盾。
+- 新增贡献者脚本：`scripts/dev-setup.sh`（worktree 内一键渲染 21 refs + 7 agents）+ `scripts/install-hooks.sh`（设置 `core.hooksPath`）。
+
+OpenClaw / 其他非 claude-code CLI 的兼容性 spike 推迟到 v10；当前 v9 默认 `target_cli=claude-code`，details 见 `.omc/notes/openclaw-spike.md`。

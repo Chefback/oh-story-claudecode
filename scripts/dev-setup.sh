@@ -32,7 +32,8 @@ for f in "$SRC_REFS"/*.md; do
 done
 
 # Render agent templates: substitute <<STORY_REF>> with the local refs dir.
-# Templates without the placeholder are copied verbatim (v8 transitional state).
+# Templates without the placeholder (chapter-extractor, story-explorer, story-researcher
+# don't read agent-references) are copied verbatim.
 rendered_agents=0
 for f in "$SRC_AGENTS"/*.md; do
   [ -f "$f" ] || continue

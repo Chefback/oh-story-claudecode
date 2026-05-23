@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# pre-commit hook — installed via `bash scripts/install-hooks.sh`.
+# Cheap blocking checks: hard fail. Advisory checks: stderr only.
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+# Block: route schema sync (story routes frontmatter ↔ body table)
+if [ -x "$ROOT/scripts/check-story-routes-sync.sh" ]; then
+  bash "$ROOT/scripts/check-story-routes-sync.sh"
+fi
+
+# Advisory: canonical references drift report (never blocks)
+if [ -x "$ROOT/scripts/check-references-canonical.sh" ]; then
+  bash "$ROOT/scripts/check-references-canonical.sh" >&2 || true
+fi

@@ -1,43 +1,19 @@
 #!/bin/bash
 # detect-story-gaps.sh — 检测写作项目中的 5 项缺口
 # 设计原则：无缺口时完全静默，不输出任何内容，避免污染 context
-# 注意：本脚本有独立的短篇项目检测逻辑（find 正文/ 目录并去重），
-# 不使用 lib/common.sh 的 discover_book_dir（该函数只找单个目录）
 set -euo pipefail
+
+# 加载公共函数库（discover_all_books 支持多本书）
+source "$(dirname "$0")/lib/common.sh"
 
 OUTPUT=""
 HAS_WARNINGS=false
 
 # 1. 新项目检测：没有书名目录（同时支持长篇和短篇项目）
-# 长篇项目：查找 追踪/ 目录
 declare -a BOOK_DIRS=()
-while IFS= read -r -d '' dir; do
-  BOOK_DIRS+=("$(dirname "$dir")")
-done < <(find "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" -maxdepth 4 -type d -name "追踪" -print0 2>/dev/null || true)
-
-# 短篇项目检测：查找包含 正文/ 目录 或 正文.md 文件 的项目目录
-declare -a SHORT_DIRS=()
-while IFS= read -r -d '' entry; do
-  SHORT_DIRS+=("$(dirname "$entry")")
-done < <(find "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" -maxdepth 3 \( -type d -name "正文" -o -type f -name "正文.md" \) -print0 2>/dev/null || true)
-
-# 从短篇目录中排除已被长篇检测到的目录（bash 3.2 兼容：用长度判空，避免 set -u 触发 unbound）
-if [ "${#SHORT_DIRS[@]}" -gt 0 ]; then
-  for short_dir in "${SHORT_DIRS[@]}"; do
-    is_book=false
-    if [ "${#BOOK_DIRS[@]}" -gt 0 ]; then
-      for book_dir in "${BOOK_DIRS[@]}"; do
-        if [ "$short_dir" = "$book_dir" ]; then
-          is_book=true
-          break
-        fi
-      done
-    fi
-    if [ "$is_book" = false ]; then
-      BOOK_DIRS+=("$short_dir")
-    fi
-  done
-fi
+while IFS= read -r dir; do
+  [ -n "$dir" ] && BOOK_DIRS+=("$dir")
+done < <(discover_all_books)
 
 if [ "${#BOOK_DIRS[@]}" -eq 0 ]; then
   # 完全新项目，没有任何目录结构 — 静默退出

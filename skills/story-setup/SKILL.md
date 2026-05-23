@@ -1,6 +1,6 @@
 ---
 name: story-setup
-version: 1.0.0
+version: 1.1.0
 description: |
   网文写作工具集基础设施部署。将 hooks/rules/agents/CLAUDE.md 等基础设施部署到用户项目目录。
   触发方式：/story-setup、「准备写书」「帮我搭一下环境」「配置写作项目」
@@ -41,9 +41,9 @@ metadata:
 - 写入项目根目录 `CLAUDE.md`（如已存在，按「CLAUDE.md 合并策略」处理）
 
 ### 2.2 部署 Hooks
-- 读取 `skills/story-setup/references/templates/hooks/` 下所有 `.sh` 文件
-- 复制到用户项目的 `.claude/hooks/` 目录
-- 确保脚本有执行权限（chmod +x）
+- 复制 `skills/story-setup/references/templates/hooks/` 下所有 `.sh` 文件到 `.claude/hooks/`
+- 同时复制子目录 `lib/`（含 `common.sh` 提供 `discover_active_book`/`discover_all_books`，`sentinel.sh` 提供 `read_sentinel_field`），目标 `.claude/hooks/lib/`
+- 确保 `.claude/hooks/*.sh` 有执行权限（chmod +x）；`lib/*.sh` 是 source 进来的，不需要可执行位
 
 ### 2.3 部署 Rules
 - 读取 `skills/story-setup/references/templates/rules/` 下所有 `.md` 文件
@@ -54,10 +54,20 @@ metadata:
 - 复制到用户项目的 `.claude/agents/` 目录
 - Agent 文件属于 story-setup 管理文件，可安全覆盖；版本升级时按 `UPGRADING.md` 的版本检测结果重新部署
 
-
 ### 2.4.1 Agent 兼容性处理
 - Agent frontmatter 以 Claude Code 为主；OpenClaw/qclaw 等只要支持 AgentSkills，未知字段（如 `memory`、`skills`、`disallowedTools`）应被忽略。若目标工具报 frontmatter 错误，保留 `name`、`description`、`tools` 三项，删除不支持字段后再部署。
-- 部署到项目后，agent 内引用的参考资料必须走 `story-setup/references/agent-references/*.md` 这一本 skill 内复制路径；不要跨 skill 引用其他 skill 的 references。若全局安装路径不同，优先用项目内 `.claude/skills/` 或 `skills/` 作为规范路径前缀，其次用工具的 skill 搜索能力，不要假定固定绝对路径。
+
+### 2.4.2 部署 Agent References
+
+agent 模板内的参考资料路径都以 `<<STORY_REF>>` 占位符表示。部署时必须把 references 复制到工作区并解析占位符，运行时只走这一条路径，不依赖跨 skill 查找。
+
+1. 复制参考资料：把 `skills/story-setup/references/agent-references/` 下所有 `.md`（21 个，不含 `_attic/`）复制到项目根目录 `.claude/agent-references/`
+2. 解析占位符：对 `.claude/agents/` 下每个已部署 agent 文件执行 `sed -i.bak 's|<<STORY_REF>>|.claude/agent-references|g'` 替换占位符为相对路径
+   - 替换后删除 `.bak` 备份文件
+   - 注意：macOS 的 `sed -i` 需要 `-i.bak` 形式（GNU sed 用 `-i ''`，部署脚本里写 `sed -i.bak ... && rm -f *.bak`）
+3. 校验：`grep -rln '<<[A-Z_]+>>' .claude/agents/` 必须输出 0 行；如有残留占位符说明替换失败，需排查后重跑
+
+> 贡献者本地（worktree 模式）跑 `bash scripts/dev-setup.sh` 等价完成 2.4 + 2.4.2，无需走 `/story-setup`。
 
 ### 2.5 部署 Session State 模板
 - 读取 `skills/story-setup/references/templates/上下文.md.tmpl`
@@ -75,14 +85,17 @@ metadata:
 ### 2.7 创建部署标记
 
 - 创建 `.story-deployed` 文件（sentinel file）
-- 写入以下字段：
+- 写入以下字段（YAML key: value 格式，hook 用 grep+sed 读取，详见 `references/templates/hooks/lib/sentinel.sh`）：
   ```
   deployed_at: <date -u +"%Y-%m-%dT%H:%M:%SZ">
-  agents_version: 8
-  setup_skill_version: 1.0.0
+  agents_version: 9
+  setup_skill_version: 1.1.0
+  target_cli: claude-code
+  resolver_strategy: template-placeholder
+  references_dir: .claude/agent-references
   ```
 - 此文件供 session-start.sh 和写作 skill 检测部署状态，避免重复提示
-- 如果 `.story-deployed` 已存在但无 `agents_version` 或版本 < 8，提示用户重新运行 story-setup 以更新 hooks/agents/rules（v8 修复 Agent 读取 skill 参考文件路径；v7 修复日更续写 continuation 与伏笔 hook 误报；v6 统一短篇主会话/子代理正文格式；v5 更新 narrative-writer 场景写法、段落密度规则和跨平台字数统计）
+- 如果 `.story-deployed` 已存在但无 `agents_version` 或版本 < 9，提示用户重新运行 story-setup 以更新 hooks/agents/rules。每次 bump 的具体变更见 `UPGRADING.md`。
 
 ## Phase 3：验证安装
 
@@ -93,9 +106,12 @@ metadata:
    - 检查 `.claude/rules/` 下的规则文件是否存在且包含 `paths` frontmatter
 3. 验证 agents：
    - 检查 `.claude/agents/` 下的 agent 定义文件是否存在
-4. 验证部署标记：
-   - 检查 `.story-deployed` 是否存在且包含时间戳
-5. 输出安装报告：
+4. 验证 agent-references 与占位符替换：
+   - 检查 `.claude/agent-references/` 下 `.md` 数量 ≥ 21
+   - 执行 `grep -rln '<<[A-Z_]+>>' .claude/agents/`，必须输出 0 行；如有残留说明 `sed` 替换失败
+5. 验证部署标记：
+   - 检查 `.story-deployed` 是否存在且包含时间戳、`agents_version: 9`、`target_cli`、`resolver_strategy`、`references_dir`
+6. 输出安装报告：
    - 列出所有已部署的文件
    - 列出需要注意的事项（如已有配置已合并）
    - 提示用户可以开始使用 `/story-long-write` 或 `/story-short-write`
@@ -136,8 +152,8 @@ hooks 注册合并按 command 字段去重：
 ## 重新部署
 
 - `.story-deployed` 不存在 → 全新安装，Phase 2 全部执行
-- `.story-deployed` 存在且 `agents_version: 8` → 提示已部署，AskUserQuestion 确认是否重新部署
-- `.story-deployed` 存在但 `agents_version` < 8 → 提示需要更新，重新执行 Phase 2 覆盖 agents/hooks/rules，CLAUDE.md 和 settings.local.json 走合并策略
+- `.story-deployed` 存在且 `agents_version: 9` → 提示已部署，AskUserQuestion 确认是否重新部署
+- `.story-deployed` 存在但 `agents_version` < 9 → 提示需要更新（v9 是 breaking change：agent 引用路径改为 `<<STORY_REF>>` 占位符，必须由 setup 渲染），重新执行 Phase 2 覆盖 agents/hooks/rules + 部署 `.claude/agent-references/`；CLAUDE.md 和 settings.local.json 走合并策略
 
 ---
 
@@ -148,8 +164,8 @@ hooks 注册合并按 command 字段去重：
 | references/templates/CLAUDE.md.tmpl | 项目根 CLAUDE.md 模板 |
 | references/templates/hooks/ | 6 个 hook 脚本模板 |
 | references/templates/rules/ | 4 条 path-scoped 规则模板 |
-| references/templates/agents/ | 7 个 agent 定义模板（story-architect, character-designer, narrative-writer, consistency-checker, story-researcher, story-explorer, chapter-extractor） |
-| references/agent-references/ | Agent 模板自带的参考资料副本；模板只引用本目录，避免跨 skill references |
+| references/templates/agents/ | 7 个 agent 定义模板（story-architect, character-designer, narrative-writer, consistency-checker, story-researcher, story-explorer, chapter-extractor）。其中创作型 4 个 agent 用 `<<STORY_REF>>` 占位符引用 references，部署时由 `sed` 渲染。 |
+| references/agent-references/ | Agent 模板的参考资料 canonical 副本（21 个 `.md`）；部署时复制到项目 `.claude/agent-references/`，agent 内 `<<STORY_REF>>/X.md` 在部署时被替换为 `.claude/agent-references/X.md`。 |
 | references/templates/settings-hooks.json | hooks 注册 JSON 片段 |
 | references/templates/上下文.md.tmpl | 写作上下文模板 |
 

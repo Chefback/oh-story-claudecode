@@ -1,9 +1,48 @@
 ---
 name: story
 description: |
-  网络小说工具箱主入口。根据用户需求自动路由到对应 skill。
-  触发方式：/story、/网文、「我想写小说」「帮我写书」「写网文」
-  当用户意图不明确时触发此 skill，由路由逻辑分发到具体的扫榜/拆文/写作/去AI味/封面 skill。
+  网络小说工具箱主入口。用户意图模糊（不知道长短篇 / 不知道走哪个子 skill）时由此路由分发。
+  触发方式：/story、/网文（不要在子意图明确时触发，子 skill 自己有触发词）
+routes:
+  - intent: 写长篇
+    skill: story-long-write
+    triggers: [开书, 写大纲, 长篇, 连载]
+  - intent: 写短篇
+    skill: story-short-write
+    triggers: [短篇, 盐言, 一万字]
+  - intent: 长篇拆文
+    skill: story-long-analyze
+    triggers: [拆文, 分析这本书, 黄金三章]
+  - intent: 短篇拆文
+    skill: story-short-analyze
+    triggers: [拆短篇, 分析这个故事]
+  - intent: 长篇扫榜
+    skill: story-long-scan
+    triggers: [长篇排行, 什么火, 起点, 番茄, 晋江]
+  - intent: 短篇扫榜
+    skill: story-short-scan
+    triggers: [短篇排行, 知乎盐言排行]
+  - intent: 去 AI 味
+    skill: story-deslop
+    triggers: [去 AI 味, 太 AI, 去味]
+  - intent: 封面
+    skill: story-cover
+    triggers: [封面, 封面图]
+  - intent: 环境部署
+    skill: story-setup
+    triggers: [准备写书, 搭环境, 初始化]
+  - intent: 浏览器操控
+    skill: browser-cdp
+    triggers: [浏览器, 抓取, 登录态]
+  - intent: 导入小说
+    skill: story-import
+    triggers: [导入, 反向解析, 导入小说, 把我的书导进来]
+  - intent: 查故事资料
+    agent: story-explorer
+    triggers: [查角色, 查伏笔, 查进度, 查设定, 什么状态, 写到哪了]
+  - intent: 查资料
+    agent: story-researcher
+    triggers: [查资料, 帮我查资料, 调研, 搜索一下, 搜一下]
 ---
 
 # story：网文工具箱路由
@@ -11,6 +50,8 @@ description: |
 你是网文工具箱的路由入口。用户的请求模糊时由你分发到具体 skill。
 
 ## 路由表
+
+> 机器读取请用 frontmatter `routes`；下表是人类可读副本，由 `scripts/check-story-routes-sync.sh` 与 frontmatter 同步校验。
 
 | 用户意图 | 关键词示例 | 路由到 |
 |---|---|---|

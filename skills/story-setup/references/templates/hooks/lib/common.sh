@@ -2,10 +2,10 @@
 # common.sh — 公共函数库，供各 hook 文件 source
 # 注意：不加 set -euo pipefail，避免 source 时覆盖调用方的 shell options
 
-# 发现活跃的书目目录（支持长篇和短篇项目）
-# 长篇：查找 追踪/ 目录
-# 短篇：查找 正文/ 目录（无需找 .md 文件，减少一层 depth 需求）
-discover_book_dir() {
+# discover_active_book — 单本书查询（活跃书目）
+# 优先 .active-book 文件；其次 find 第一个 追踪/ (长篇) 或 正文/ (短篇) 目录
+# 使用场景：session-start / session-end / pre-compact / post-compact —— 一次会话只关心当前活跃的那本书
+discover_active_book() {
   if [ -f ".active-book" ]; then
     cat ".active-book"
     return
@@ -22,4 +22,23 @@ discover_book_dir() {
   if [ -n "$story_dir" ]; then
     dirname "$story_dir"
   fi
+}
+
+# discover_all_books — 多本书查询（项目内所有书目）
+# 输出：换行分隔的目录路径列表（不含重复）
+# 使用场景：detect-story-gaps —— 需要遍历项目内所有书目做缺口检测
+discover_all_books() {
+  local root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+  # 用 awk 去重保持插入顺序（bash 3.2 兼容，不用关联数组）
+  {
+    # 长篇：追踪/ 父目录
+    find "$root" -maxdepth 4 -type d -name "追踪" -print 2>/dev/null | while IFS= read -r d; do dirname "$d"; done
+    # 短篇：正文/ 父目录 或 正文.md 父目录
+    find "$root" -maxdepth 3 \( -type d -name "正文" -o -type f -name "正文.md" \) -print 2>/dev/null | while IFS= read -r d; do dirname "$d"; done
+  } | awk '!seen[$0]++'
+}
+
+# 旧名 alias，仅供外部自定义 hook 引用；新代码用 discover_active_book / discover_all_books。
+discover_book_dir() {
+  discover_active_book "$@"
 }
