@@ -27,7 +27,7 @@ metadata:
 
 ### 原则 2：复用不重复
 
-深度分析阶段调用现成的拆解管线，不重新发明：长篇调 story-long-analyze 的完整拆解管线，短篇调 story-short-analyze 的拆解管线。方法论与输出模板沿用对应 analyze skill 的 references（长篇见 [material-decomposition.md](../story-long-analyze/references/material-decomposition.md)、[output-templates.md](../story-long-analyze/references/output-templates.md)）。
+深度分析阶段调用现成的拆解管线，不重新发明：长篇运行 `/story-long-analyze` 的完整拆解管线，短篇运行 `/story-short-analyze` 的拆解管线。拆解方法论与输出模板由对应 analyze skill 自带，story-import 不执行拆解方法论、不维护这些文件。
 
 ### 原则 3：标注导入来源
 
@@ -84,7 +84,7 @@ metadata:
 
 ### 原文备份
 
-原文备份由 Phase 2 调用的 analyze 拆解管线负责（analyze 管线前置步骤会把原文复制/保存到 `拆文库/{书名}/原文/`，见 `story-long-analyze/SKILL.md` 与 `story-short-analyze/SKILL.md` 的「原文备份（管道前置步骤）」）。Phase 1 只需确认源文件就绪（路径有效或文本已拿到），不在此处单独备份，避免与 analyze 管线重复备份逻辑。
+原文备份由 Phase 2 调用的 analyze 拆解管线负责（analyze 管线前置步骤会把原文复制/保存到 `拆文库/{书名}/原文/`，对应 story-long-analyze 与 story-short-analyze 的「原文备份（管道前置步骤）」）。Phase 1 只需确认源文件就绪（路径有效或文本已拿到），不在此处单独备份，避免与 analyze 管线重复备份逻辑。
 
 ---
 
@@ -100,14 +100,14 @@ metadata:
 ### 调用契约
 
 <!--
-  契约说明：story-import 依赖 story-long-analyze 的「跳过询问」机制（见
-  story-long-analyze/SKILL.md「Stage 1 停靠点」的「跳过询问的情形」）。
+  契约说明：story-import 依赖 story-long-analyze 的「跳过询问」机制
+  （对应 story-long-analyze「Stage 1 停靠点」的「跳过询问的情形」）。
   若 story-long-analyze 后续重构改动了该机制的触发措辞，需同步检查并更新本契约。
 -->
 
 #### 长篇：自动续跑过 Stage 1 停靠点
 
-story-long-analyze 在 Stage 0+1（黄金三章）后会**自动停靠**并用 AskUserQuestion 询问是否继续全量拆解（见 `story-long-analyze/SKILL.md` 的「Stage 1 停靠点」）。但导入场景需要 Stage 2-5 的全套产物（逐章摘要 / 聚合分析 / 设定关系 / 汇总报告），缺一不可——否则 Phase 3 迁移会拿到半成品。
+story-long-analyze 在 Stage 0+1（黄金三章）后会**自动停靠**并用 AskUserQuestion 询问是否继续全量拆解（对应 story-long-analyze 的「Stage 1 停靠点」）。但导入场景需要 Stage 2-5 的全套产物（逐章摘要 / 聚合分析 / 设定关系 / 汇总报告），缺一不可——否则 Phase 3 迁移会拿到半成品。
 
 因此调用 story-long-analyze 时**必须在一开始就以「完整拆解、一次跑完、不要停下询问」模式驱动管线**，命中其「跳过询问」路径（用户开头明确说「完整拆解 / 一次跑完 / 系统拆解 / 别问」时不停靠），让管线自动从 Stage 2 续跑到 Stage 5。
 
@@ -164,7 +164,7 @@ story-short-analyze 是单一全量拆解管道（Stage 2-6），**无 Stage 1 �
 
 ### 长篇 6 阶段管道
 
-> 管道详细说明见 [story-long-analyze/SKILL.md](../story-long-analyze/SKILL.md)，此处仅列概要。
+> 管道详细说明见 story-long-analyze（运行 `/story-long-analyze`），此处仅列概要。
 
 | 阶段 | 名称 | 输入 | 输出 | 完成标志 |
 |------|------|------|------|----------|
@@ -177,7 +177,7 @@ story-short-analyze 是单一全量拆解管道（Stage 2-6），**无 Stage 1 �
 
 ### 短篇拆文管道
 
-> 管道详细说明见 [story-short-analyze/SKILL.md](../story-short-analyze/SKILL.md)，此处仅列概要。
+> 管道详细说明见 story-short-analyze（运行 `/story-short-analyze`），此处仅列概要。
 
 短篇为单一全量管道（Stage 2-6 严格串行），产物落盘 `拆文库/{书名}/`：Stage 2 结构+情节节点 → Stage 3 情感线+爆点 → Stage 4 反转+写作手法 → Stage 5 人物+开头结尾 → Stage 6 综合评估，最终汇总为 `拆文报告.md`、`情节节点.md`、`写作手法.md`。
 
@@ -197,11 +197,11 @@ story-short-analyze 是单一全量拆解管道（Stage 2-6），**无 Stage 1 �
 - 中断时通过进度文件追踪进度
 - 新会话读取进度文件定位断点
 - 从断点所在块的起始章节恢复
-- 长篇进度文件格式参照 [output-templates.md](../story-long-analyze/references/output-templates.md) 中的进度段落，包含当前阶段、最后处理章节、已完成阶段列表、更新时间
+- 长篇进度文件格式沿用 story-long-analyze 拆解管线的进度段落约定，包含当前阶段、最后处理章节、已完成阶段列表、更新时间
 
 ### 质量门控
 
-长篇阶段 3-4 完成前执行质量检查（置信度 >= 0.85，覆盖率 85%-95%，重叠率 <= 35%）。详见 [material-decomposition.md](../story-long-analyze/references/material-decomposition.md)。短篇质量门控见 story-short-analyze 各阶段的完成标志。
+长篇阶段 3-4 完成前执行质量检查（置信度 >= 0.85，覆盖率 85%-95%，重叠率 <= 35%），由 story-long-analyze 拆解管线自带的质量门控负责。短篇质量门控见 story-short-analyze 各阶段的完成标志。
 
 ---
 
@@ -288,7 +288,7 @@ source: 导入反推
 
 #### 3.4 关系文件迁移
 
-将 `拆文库/{书名}/角色/角色关系.md` 转换为 `设定/关系.md`，按 [artifact-protocols.md](../story-long-write/references/artifact-protocols.md) 的关系模板格式输出。
+将 `拆文库/{书名}/角色/角色关系.md` 转换为 `设定/关系.md`，按 [structure-mapping-long.md](references/structure-mapping-long.md)「关系文件转换规则」的目标格式模板输出。
 
 #### 3.5 世界观设定拆分
 
@@ -325,7 +325,7 @@ source: 导入反推
 - 起始状态 → 结束状态：{从角色弧线推断}
 ```
 
-**卷纲**：卷划分确认后，从剧情文件聚合生成 `大纲/卷纲_第X卷.md`，按 [artifact-protocols.md](../story-long-write/references/artifact-protocols.md) 卷纲模板格式。
+**卷纲**：卷划分确认后，从剧情文件聚合生成 `大纲/卷纲_第X卷.md`，按 [structure-mapping-long.md](references/structure-mapping-long.md)「卷纲反推」模板格式。
 
 **细纲**：从章节摘要反推生成 `大纲/细纲_第XXX章.md`：
 
@@ -386,7 +386,7 @@ source: 导入反推
 
 - **输入来源**：拆文库已有产物（`角色/{角色名}.md`、`角色/角色关系.md`、`章节/第N章_摘要.md` 情节点、`剧情/*.md`）+ 已生成的 `追踪/伏笔.md`，**不重读 `原文/`**。
 - **追踪范围**：主角、反派、核心配角；功能角色不进入。
-- **输出对齐**：严格对齐 [artifact-protocols.md](../story-long-write/references/artifact-protocols.md) 的 `角色状态.md` 标准模板（当前身份 / 当前能力 / 关键关系 / 公众形象 / 待回收伏笔 / 状态变更记录），全文加 `[导入反推]` 标记。
+- **输出对齐**：严格对齐 [character-state-reverse.md](references/character-state-reverse.md)「输出格式」的 `角色状态.md` 标准模板（当前身份 / 当前能力 / 关键关系 / 公众形象 / 待回收伏笔 / 状态变更记录），全文加 `[导入反推]` 标记。
 - **生成时机**：必须在 `追踪/伏笔.md` 之后（步骤「待回收伏笔」依赖伏笔状态）。
 - **半成品书**：最后一章为残稿时，角色状态以「残稿之前的最后一个完整章节」为准，文件头注明基准章节。
 
@@ -411,7 +411,7 @@ source: 导入反推
 
 #### 3.8 题材定位生成
 
-从拆文报告中提取核心发现，生成 `设定/题材定位.md`（按 [artifact-protocols.md](../story-long-write/references/artifact-protocols.md) 模板格式）。
+从拆文报告中提取核心发现，生成 `设定/题材定位.md`（按 [structure-mapping-long.md](references/structure-mapping-long.md)「题材定位生成」模板格式）。
 
 ---
 
@@ -438,7 +438,7 @@ source: 导入反推
 
 #### 3-S.1 正文迁移
 
-将 `拆文库/{书名}/原文/` 的全文迁移为单文件 `{标题}/正文.md`，按 `story-short-write/references/format-and-structure.md` 规范化格式（小节标记 `###1.`、段间无空行、半角双引号对话）。**原文已是成稿，不重写内容，只规范格式。**
+将 `拆文库/{书名}/原文/` 的全文迁移为单文件 `{标题}/正文.md`，按 [format-and-structure.md](references/format-and-structure.md) 规范化格式（小节标记 `###1.`、段间无空行、半角双引号对话）。**原文已是成稿，不重写内容，只规范格式。**
 
 #### 3-S.2 设定生成
 
@@ -547,21 +547,21 @@ source: 导入反推
 
 按阶段加载，不一次全部加载。
 
+本 skill 自带的 reference 文件全部位于 `references/`，按场景加载。涉及别的 skill 的方法论/模板时，story-import 不直接加载文件，而是运行对应 `/命令` 由该 skill 自行加载。
+
 ### Phase 1：确认导入源
 
 | 场景 | 加载文件 |
 |------|---------|
 | 篇幅分流判定 | `references/length-routing.md` |
-| 章节格式识别 | `../story-long-analyze/references/material-decomposition.md`（阶段 1） |
+| 章节格式识别 | 由 story-long-analyze 拆解管线（运行 `/story-long-analyze`）的阶段 1 负责 |
 
 ### Phase 2：深度分析
 
-| 场景 | 加载文件 |
+| 场景 | 加载文件 / 相关 skill |
 |------|---------|
-| 长篇分析方法论 / 质量门控 | `../story-long-analyze/references/material-decomposition.md` |
-| 长篇输出模板 | `../story-long-analyze/references/output-templates.md` |
-| 长篇拆解管线 | `../story-long-analyze/SKILL.md` |
-| 短篇拆解管线 | `../story-short-analyze/SKILL.md` |
+| 长篇深度分析（方法论、质量门控、输出模板均自带） | 运行 `/story-long-analyze` 调用长篇拆解管线 |
+| 短篇深度分析（方法论、质量门控、输出模板均自带） | 运行 `/story-short-analyze` 调用短篇拆解管线 |
 
 ### Phase 3：结构迁移
 
@@ -570,18 +570,18 @@ source: 导入反推
 | 长篇迁移映射规则 | `references/structure-mapping-long.md` |
 | 短篇迁移映射规则 | `references/structure-mapping-short.md` |
 | 角色状态反推规则（长篇） | `references/character-state-reverse.md` |
-| Artifact 模板 | `../story-long-write/references/artifact-protocols.md` |
-| 长篇细纲模板 | `../story-long-write/SKILL.md`（Phase 3 细纲部分） |
-| 短篇格式规范 | `../story-short-write/references/format-and-structure.md` |
-| 短篇核心框架模板 | `../story-short-write/SKILL.md`（核心框架部分） |
+| 角色状态规则（character-state-reverse.md 依赖） | `references/state-tracking.md` |
+| 短篇正文格式规范 | `references/format-and-structure.md` |
+
+> 长篇细纲模板格式参见 story-long-write（Phase 3 细纲部分）；短篇核心框架模板参见 story-short-write（核心框架部分）。这两项为纯文本指引，story-import 不加载对应 skill 的文件。
 
 ### Phase 4：项目激活
 
-| 场景 | 加载文件 |
+| 场景 | 说明 |
 |------|---------|
-| 长篇项目结构规范 | `../story-long-write/SKILL.md`（Phase 4 项目文件结构） |
-| 短篇项目结构规范 | `../story-short-write/SKILL.md`（Phase 3 项目结构） |
-| 部署模板 | `../story-setup/references/templates/CLAUDE.md.tmpl` |
+| 长篇项目结构规范 | 参见 story-long-write（Phase 4 项目文件结构） |
+| 短篇项目结构规范 | 参见 story-short-write（Phase 3 项目结构） |
+| 环境部署 | 部署模板由 `/story-setup` 提供，story-import 不负责部署 |
 
 ---
 
