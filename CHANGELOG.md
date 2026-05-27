@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## v0.6.10
 
 > story-long-analyze 拆解管道修正 + 拆文产物按主题拆分 + 下游 story-import / story-long-write 同步对齐
 
