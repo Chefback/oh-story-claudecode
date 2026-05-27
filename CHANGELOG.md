@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## v0.6.10
 
-> story-long-analyze 拆解管道修正 + 拆文产物按主题拆分 + 下游 story-import / story-long-write 同步对齐
+> story-long-analyze 拆解管道修正 + 拆文产物按主题拆分 + 下游 story-import / story-long-write 同步对齐 · story-deslop rubric 收紧 + 写作课程禁用句式批量导入 · 对标书产物术语作者化
 
 ### 改进
 
@@ -17,6 +17,10 @@ All notable changes to this project will be documented in this file.
 - **story-long-analyze**：Stage 4 设定按主题拆分多文件输出——`设定/世界观/{背景设定,力量体系,地理,金手指}.md` + `设定/势力/{势力名}.md`，与下游 story-import / story-long-write 项目结构对齐，下游不再做 re-split。
 - **story-import（已有小说导入）**：3.5 拆分步骤识别两种拆文库形态——`设定/世界观/` 子目录存在则 pass-through；只有单文件 `设定/世界观.md` 则走原 re-split 逻辑（早期拆文库或手动写的兜底）。
 - **story-long-write（长篇写作）**：单章准备层读取路径从 `设定/金手指.md 或 世界观.md` 改为 glob `设定/世界观/*.md`，回退到单文件 `设定/世界观.md`、再回退 `设定/金手指.md`，全缺失则跳过不阻塞。项目结构文档同步更新到按主题拆分布局。
+- **story-deslop（去 AI 味）**：rubric 全面收紧 + 从两份高信号写作课程 prompt（prompt_11257 / prompt_78650）批量导入禁用句式。Gate B 新增「不是 A，而是 B」「声音不大，却带着……」并把「如同」并入 仿佛 / 犹如 / 宛若 家族；新增「修饰词清扫」子块（形容词 / 定语 / 副词 / 指示代词 / 量词）；Gate C / D 把「重复语义」拆成 4 桶（形容词 / 近义词 / 含义 / 上下文主语）+ 加「多余场景 / 人物 / 物品描写」子块；Phase 4 报告加「字数协议」（原文 / 修订后 / 净变化 / 上限）+ 3 轮 stop rule + 「再检一次」尾检；Phase 4 明确文件路径模式——直接走 Edit / Write，对话里只 emit ≤200 字样本（避免长章节重发）；narrative-writer spawn 加 anti-recursion guard；明确「嵌入式提醒」模式仅 Phase 1+2。
+- **story-deslop**：banned-words.md 新增「最毒禁用句式」表（毒级 ★★-★★★★★，仅来自两份 source prompt）；一级禁用补充 `如同` / `不容置喙` / `冰冷`；新增「书面腔→口语化」mini-table；新增「比喻分类」表（5 类，来自 prompt_78650）。anti-ai-writing.md 把「段落是否超过 3 句」改为网文段落规则（一句一段，≤4 分句，per prompt_78650）。6 份共享 reference 副本全部同步（涵盖 story-deslop / long-write / short-write / short-analyze / review / story-setup）。
+- **story-setup / 日更文档（术语）**：Stage 6 产物在日更文档和 setup agent 模板里的称呼统一从「文风画像」改成 `文风.md`；把实现层的 metadata 语言换成作者向的「生成记录」契约。既有 agent JSON 字段保持兼容。
+- **output-templates.md（小修）**：清掉 Stage 6 模板末尾的尾部空白，恢复 `git diff --check` 干净（writer-friendly 术语合并的遗留）。
 
 ### Bug 修复
 
@@ -24,6 +28,11 @@ All notable changes to this project will be documented in this file.
 - 修复 chapter-extractor 两份模板内容已经悄悄不一致（一份说「输出对齐 output-templates.md」，另一份说「不依赖外部模板」）。
 - 修复章节正则 `第[一二三四五六七八九十百零0-9]+章` 对 1000+ 章长篇（盘龙 / 诡秘之主等）匹配失败的截断问题。
 - 修复 story-long-write 日更循环读 `设定/金手指.md 或 世界观.md` 的扁平路径——拆文产物已经按主题拆到子目录后，这条扁平读取会 ENOENT 静默失败。
+- 修复 story-deslop 英文触发词 `deslop` 与 `/oh-my-claudecode:ai-slop-cleaner` 冲突——删除该触发词避免误路由。
+- 修复 story-deslop 综合判定规则 off-by-one：「五项 → 六项」（评估表实际包含 6 个指标）。
+- 修复 story-deslop 「15% 上限」陈述与「分级删除上限 15/25/35%」不一致——统一改为「对应等级上限」。
+- 修复 story-deslop Phase 1 报告的 排比 sample 归类错误（节奏 → 句式，对应 Gate B 而非 Gate D）。
+- 修复 story-deslop 三遍法 ↔ Gate 的 1:1 映射叙述错误——实际是 overlap，重写为诚实的 overlap 表述。
 
 ### 验证
 
@@ -34,6 +43,9 @@ All notable changes to this project will be documented in this file.
 - 两份 chapter-extractor 副本 `diff -q` 空输出，byte-identical。
 - 跨 skill 读取路径审计：story-long-write 已无扁平 `设定/世界观.md` / `设定/金手指.md` 单点读，全部走 glob + 回退链；story-import 既能 pass-through 新版子目录形态，也能 re-split 单文件版本。
 - `_progress.md` 4 个状态值（`pending` / `paused_after_stage1` / `completed` / `completed_with_errors`）在 `pipeline-ops.md` 全部保留，无回归。
+- `scripts/check-shared-files.sh` 全过（story-deslop 改动涉及 6 份共享 reference 副本，banned-words.md / anti-ai-writing.md 跨 skill 同步）。
+- `scripts/check-story-setup-deployment.sh` / `scripts/static-check.sh` 通过；macos / windows / static-check 三套 CI 全绿。
+- 「文风画像 → 文风.md」术语统一：日更文档与 setup agent 模板审计通过，既有 agent JSON 字段兼容性保留。
 
 ## v0.6.9
 
