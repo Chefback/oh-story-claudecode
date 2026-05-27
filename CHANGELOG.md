@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## v0.6.10
 
-> story-long-analyze 拆解管道修正 + 拆文产物按主题拆分 + 下游 story-import / story-long-write 同步对齐 · story-deslop rubric 收紧 + 写作课程禁用句式批量导入 · 对标书产物术语作者化
+> story-long-analyze 拆解管道修正 + 拆文产物按主题拆分 + 下游 story-import / story-long-write 同步对齐 · story-deslop rubric 收紧 + 禁用句式批量导入 · 对标书产物术语作者化
 
 ### 改进
 
@@ -17,7 +17,7 @@ All notable changes to this project will be documented in this file.
 - **story-long-analyze**：Stage 4 设定按主题拆分多文件输出——`设定/世界观/{背景设定,力量体系,地理,金手指}.md` + `设定/势力/{势力名}.md`，与下游 story-import / story-long-write 项目结构对齐，下游不再做 re-split。
 - **story-import（已有小说导入）**：3.5 拆分步骤识别两种拆文库形态——`设定/世界观/` 子目录存在则 pass-through；只有单文件 `设定/世界观.md` 则走原 re-split 逻辑（早期拆文库或手动写的兜底）。
 - **story-long-write（长篇写作）**：单章准备层读取路径从 `设定/金手指.md 或 世界观.md` 改为 glob `设定/世界观/*.md`，回退到单文件 `设定/世界观.md`、再回退 `设定/金手指.md`，全缺失则跳过不阻塞。项目结构文档同步更新到按主题拆分布局。
-- **story-deslop（去 AI 味）**：rubric 全面收紧 + 从两份高信号写作课程 prompt（prompt_11257 / prompt_78650）批量导入禁用句式。Gate B 新增「不是 A，而是 B」「声音不大，却带着……」并把「如同」并入 仿佛 / 犹如 / 宛若 家族；新增「修饰词清扫」子块（形容词 / 定语 / 副词 / 指示代词 / 量词）；Gate C / D 把「重复语义」拆成 4 桶（形容词 / 近义词 / 含义 / 上下文主语）+ 加「多余场景 / 人物 / 物品描写」子块；Phase 4 报告加「字数协议」（原文 / 修订后 / 净变化 / 上限）+ 3 轮 stop rule + 「再检一次」尾检；Phase 4 明确文件路径模式——直接走 Edit / Write，对话里只 emit ≤200 字样本（避免长章节重发）；narrative-writer spawn 加 anti-recursion guard；明确「嵌入式提醒」模式仅 Phase 1+2。
+- **story-deslop（去 AI 味）**：rubric 全面收紧 + 从两份高信号来源 prompt（prompt_11257 / prompt_78650）批量导入禁用句式。Gate B 新增「不是 A，而是 B」「声音不大，却带着……」并把「如同」并入 仿佛 / 犹如 / 宛若 家族；新增「修饰词清扫」子块（形容词 / 定语 / 副词 / 指示代词 / 量词）；Gate C / D 把「重复语义」拆成 4 桶（形容词 / 近义词 / 含义 / 上下文主语）+ 加「多余场景 / 人物 / 物品描写」子块；Phase 4 报告加「字数协议」（原文 / 修订后 / 净变化 / 上限）+ 3 轮 stop rule + 「再检一次」尾检；Phase 4 明确文件路径模式——直接走 Edit / Write，对话里只 emit ≤200 字样本（避免长章节重发）；narrative-writer spawn 加 anti-recursion guard；明确「嵌入式提醒」模式仅 Phase 1+2。
 - **story-deslop**：banned-words.md 新增「最毒禁用句式」表（毒级 ★★-★★★★★，仅来自两份 source prompt）；一级禁用补充 `如同` / `不容置喙` / `冰冷`；新增「书面腔→口语化」mini-table；新增「比喻分类」表（5 类，来自 prompt_78650）。anti-ai-writing.md 把「段落是否超过 3 句」改为网文段落规则（一句一段，≤4 分句，per prompt_78650）。6 份共享 reference 副本全部同步（涵盖 story-deslop / long-write / short-write / short-analyze / review / story-setup）。
 - **story-setup / 日更文档（术语）**：Stage 6 产物在日更文档和 setup agent 模板里的称呼统一从「文风画像」改成 `文风.md`；把实现层的 metadata 语言换成作者向的「生成记录」契约。既有 agent JSON 字段保持兼容。
 - **output-templates.md（小修）**：清掉 Stage 6 模板末尾的尾部空白，恢复 `git diff --check` 干净（writer-friendly 术语合并的遗留）。
