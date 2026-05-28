@@ -113,9 +113,9 @@ Stage 6 内容写完后、`stages_completed[6]` append 前，跑三道门控：
 
 > 情节节点数（15-60 个，按字数分档）走 `情节节点.md` 自己的密度校验（见 material-decomposition.md），不在本表。`beats` 是结构段数，不是情节节点数。
 
-### 7.3 `output-templates.md` BLOCK 项扫描
+### 7.3 `story-short-analyze/references/output-templates.md` BLOCK 项扫描
 
-扫 `output-templates.md` 所有 `[BLOCK]` 标注项对应的产出段是否在 `拆文报告.md` 出现。
+扫 `story-short-analyze/references/output-templates.md` 所有 `[BLOCK]` 标注项对应的产出段是否在 `拆文报告.md` 出现。
 任一缺失 → 阻断。`[WARN]` 项 → 写入拆文报告末尾「待补」清单，不阻断。
 
 ### 7.4 通过

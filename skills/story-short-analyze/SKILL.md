@@ -77,7 +77,7 @@ word_count = 全文字数
   └─ 是 → 询问用户三选一：
        (a) 覆盖：归档旧产出到 拆文库/{书名}/_archive_{时间戳}/ 后从 Stage 2 重跑
        (b) 续跑：读 _meta.json.last_stage_in_progress（非空 → 从该 Stage 整段重跑）
-                 或读 _meta.json.stages_completed[](从 max+1 续跑)
+                 或读 _meta.json.stages_completed[]（从 max+1 续跑）
        (c) 取消
 ```
 
