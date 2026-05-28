@@ -453,8 +453,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 | 商业创作核心方法 | `references/style-commercial-theory.md` |
 | 对话 | `references/dialogue-mastery.md` |
 | 人物深化 | `references/character-design-methods.md` |
-| 情绪技法 | `references/plot-emotion-system.md` + `references/emotional-methods.md` |
-| 叙事单元 | `references/narrative-units.md` |
+| 情绪技法 + 叙事单元 | `references/plot-emotion-system.md` + `references/emotional-methods.md` |
 | 写作技法全程参考 | `references/writing-craft.md` |
 | 格式与结构规范 | `references/format-and-structure.md`（仅对话/段落格式适用长篇） |
 | 状态追踪协议 | `references/state-tracking.md` |
