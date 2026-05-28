@@ -313,6 +313,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
      - (b) **匹配章节挑选**：从 `{对标书路径}/章节/*_摘要.md` grep `基调：(紧张|轻松|悲伤|热血|温馨|压抑)`（全角冒号），按本章目标情绪挑章 K——多章同基调时选择规则：先看爽点类型是否接近，再看情节点数量/原文章节估算字数是否接近本章目标字数，最后取章节号最小者；必读 `{对标书路径}/章节/第K章_摘要.md`，若同章存在 `第K章_深度拆解.md` 则加读，否则回退黄金三章深度拆解/文风文件里的可借鉴技巧，不因非黄金三章缺少深度拆解而失败
      - (c) **模块召回**：从对标的结构化子目录（角色/剧情/设定）中按本章情节检索相关模块
      - (d) 输出"对标召回摘要 + 文风召回指令 + 原文锚点片段引用"（合计 ≤10 条），作为 narrative-writer 的输入
+     - (e) **语料库检索**（可选增强）：如果 `拆文库/语料库索引.md` 存在，读取索引按本章目标情绪和技法类型检索其他拆文库书目中的相似范本。按题材匹配→技法匹配→情绪匹配的优先级，在匹配书目的 `拆文报告.md`（可借鉴套路/写法技巧）和 `章节/*_摘要.md`（情绪基调）中检索。输出最多 3 条语料库召回结果，每条含书名+章节号+匹配原因+原文锚点片段（≤300字）。语料库为空或索引不存在时跳过，不阻塞。详细检索方法见 `references/corpus-search.md`
      - **快捷路径**：项目已部署 story-explorer agent 时（检查 `.claude/agents/story-explorer.md`），直接 spawn `Agent(subagent_type: "story-explorer", prompt: "项目目录：{dir}\n查询类型：benchmark_style_load\n查询参数：我要写第 {N} 章；这一章按细纲偏{紧张/热血/轻松等}，目标字数约 {N}，爽点类型={如有}")` 一次拿到 `{style_profile_path, style_profile_summary, matched_chapter_K, matched_chapter_techniques, anchor_excerpts, gaps}`；准备层必须原样保留 `gaps`，若 `gaps.matched_deep_dive_missing: true`，文风召回指令必须说明已用黄金三章/文风文件里的技巧回退
    - 3.3 **指令确认**：综合细纲+最简记忆包+模块召回结果，确认本章节奏（快/慢）和情绪目标，用一句话概括本章写作意图。例：「快节奏打脸——读者等了三章，这章必须一拳到位。技法=信息差揭示（hooks-suspense.md），用于第2-4段。」
 4. **资料研究**（按需）：如果写作中遇到需要查证的外部事实（历史年代、地理方位、职业细节等），spawn `story-researcher` agent 搜索并输出到 `参考资料/` 目录。研究完成后再继续写作。
@@ -449,6 +450,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 | 写作技法全程参考 | `references/writing-craft.md` |
 | 格式与结构规范 | `references/format-and-structure.md`（仅对话/段落格式适用长篇） |
 | 状态追踪协议 | `references/state-tracking.md` |
+| 语料库检索 | `references/corpus-search.md`（可选增强，语料库存在时加载） |
 
 ### Phase 5：质量检查
 
