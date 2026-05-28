@@ -425,12 +425,12 @@ N2 **自我认知**：类型{转折} | 情绪{心酸}{-5} | 涉及{沈暮月}
 
 ```jsonc
 "structure_counts": {
-  "beats": 5,                    // 来自 Stage 2 情节节点数（≥4）
+  "beats": 5,                    // 来自 Stage 2 结构段数（开端/发展/高潮/结局，≥4）
   "hooks": 4,                    // 来自 Stage 3 钩子数（≥3）
-  "setup_clues": 3,              // 来自 Stage 4 反转铺垫数（≥3）
+  "setup_clues": 3,              // 来自 Stage 4 反转铺垫数（≥3；无反转题材填 0 并跳过该阈值）
   "character_archetypes": 3,     // 来自 Stage 5 有反差人物数（≥2）
   "reusable_structures": 3,      // 来自 Stage 6 可复用条数（≥3）
-  "reversal_type": "视角反转"     // 枚举: 视角/身份/动机/时间线/信息/认知
+  "reversal_type": "视角反转"     // 枚举: 视角/身份/动机/时间线/信息/认知/无反转
 }
 ```
 

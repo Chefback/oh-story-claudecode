@@ -22,7 +22,7 @@ sync-policy: |
 ```
 拆文库/{书名}/
 ├── 原文/                  # 管道前置步骤产出，存放源文件备份
-├── 拆文报告.md             # 人类可读综合报告（Stage 2-6 综合，含 _structure_counts 段）
+├── 拆文报告.md             # 人类可读综合报告（Stage 2-6 综合）
 ├── 情节节点.md             # Stage 2 情节节点清单
 ├── 写作手法.md             # Stage 4 写作手法分析
 └── _meta.json             # 管道元数据 + 结构计数（resume + Phase 7 门控数值依据）
@@ -60,12 +60,12 @@ sync-policy: |
   "last_stage_in_progress": null,       // 当前正在执行的 Stage；空闲为 null
 
   "structure_counts": {                 // Stage 6 完成时一次性写入；Phase 7.2 验收依据
-    "beats": 5,                         // 情节节点数（Stage 2）
+    "beats": 5,                         // 结构段数（结构划分，开端/发展/高潮/结局，Stage 2）
     "hooks": 4,                         // 钩子数（Stage 3）
     "setup_clues": 3,                   // 反转铺垫线索数（Stage 4）
     "character_archetypes": 3,          // 有反差人物数（Stage 5）
     "reusable_structures": 3,           // 可复用手法条数（Stage 6）
-    "reversal_type": "视角反转"          // 反转类型枚举（视角/身份/动机/时间线/信息/认知）
+    "reversal_type": "视角反转"          // 反转类型枚举（视角/身份/动机/时间线/信息/认知/无反转）；甜宠/喜剧/报应型填「无反转」
   }
 }
 ```
@@ -85,6 +85,8 @@ sync-policy: |
 - `last_stage_in_progress` 为空 → 从 `max(stages_completed) + 1` 开始。
 - `stages_completed` 含 6 → 已完成，询问用户覆盖/取消。
 
+**Stage 6 = 内容写完 AND Phase 7 通过**。Phase 7 未过前 `last_stage_in_progress` 保持 `6`、`stages_completed` 不含 `6`；resume 时正文/structure_counts 已在盘上，只重跑 Phase 7 门控，不重写 Stage 6 正文。
+
 ---
 
 ## Phase 7 门控接入点
@@ -101,13 +103,15 @@ Stage 6 内容写完后、`stages_completed[6]` append 前，跑三道门控：
 
 | 字段 | 最低值 | 不达标 |
 |------|--------|--------|
-| `structure_counts.beats` | ≥ 4 | 阻断 |
+| `structure_counts.beats` | ≥ 4（结构段：开端/发展/高潮/结局）| 阻断 |
 | `structure_counts.hooks` | ≥ 3 | 阻断 |
-| `structure_counts.setup_clues` | ≥ 3 | 阻断 |
+| `structure_counts.setup_clues` | ≥ 3（reversal_type=无反转时跳过本行）| 阻断 |
 | `structure_counts.character_archetypes` | ≥ 2 | 阻断 |
 | `structure_counts.reusable_structures` | ≥ 3 | 阻断 |
-| `structure_counts.reversal_type` | 在枚举内 | 阻断 |
+| `structure_counts.reversal_type` | 在枚举内（含「无反转」）| 阻断 |
 | `genre_detected` | 非空 | 阻断 |
+
+> 情节节点数（15-60 个，按字数分档）走 `情节节点.md` 自己的密度校验（见 material-decomposition.md），不在本表。`beats` 是结构段数，不是情节节点数。
 
 ### 7.3 `output-templates.md` BLOCK 项扫描
 
@@ -123,9 +127,12 @@ Stage 6 内容写完后、`stages_completed[6]` append 前，跑三道门控：
 
 ## 下游消费规范（story-short-write 怎么用）
 
+> `story-short-write` 当前硬编码读 `拆文报告.md / 情节节点.md / 写作手法.md` 三个 markdown。
+> `_meta.json` 是可选增强：read 容忍，不存在不阻塞写作。
+
 | 文件 | 角色 | 怎么读 |
 |------|------|--------|
-| `_meta.json` | 数字门面 + 题材识别 | 看 `genre_detected` 决定哪个题材标尺，读 `structure_counts` 确认拆文完整性，读 `structure_counts.reversal_type` 选反转骨架 |
+| `_meta.json`（可选）| 数字门面 + 题材识别 | 看 `genre_detected` 决定哪个题材标尺，读 `structure_counts` 确认拆文完整性，读 `structure_counts.reversal_type` 选反转骨架 |
 | `拆文报告.md` | 分析叙事主体 | 读「故事核」「结构」「情感曲线」「爆点」「反转分析」「人物」「五维评分」「共鸣分析」「可复用结构」「同类型写作动作」段，是 writer 的主输入 |
 | `情节节点.md` | 节奏锚点 | 看每个节点的字数位置 + 功能 + 触发事件，给新故事排节奏 |
 | `写作手法.md` | 手法库 | POV / 对话 / 时间 / 信息控制 等具体手法 + 原文示例，新篇里复用 |
@@ -145,7 +152,7 @@ Stage 6 内容写完后、`stages_completed[6]` append 前，跑三道门控：
 ls 拆文库/{书名}/   # 应有：原文/ 拆文报告.md 情节节点.md 写作手法.md _meta.json
 /story-short-write 拆文库/{书名}/
 # 通过：输出 8000+ 字同题材新短篇，prose 有源文对话节奏和画面感
-# 失败：写得像填空 / 或 short-write 找不到 _meta.json
+# 失败：写得像填空 / 或 short-write 找不到三个 markdown
 ```
 
 ---
