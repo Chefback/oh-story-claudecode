@@ -198,7 +198,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 
 大纲完成后，创建以下 artifact（加载 [references/artifact-protocols.md](references/artifact-protocols.md) 中对应模板）：
 - **大纲/大纲.md**：全书卷级鸟瞰（卷名+字数+章数+核心事件+状态变化，一段式汇总）
-- **大纲/卷纲_第X卷.md**：每卷的爽点节奏+情绪弧线+人物弧线+伏笔+反转（参考 outline-methods.md「大纲三个维度结构法」 + emotional-arc-design.md「六种弧线速查」 + reversal-toolkit.md「五种反转类型」）
+- **大纲/卷纲_第X卷.md**：每卷的爽点节奏+情绪弧线+人物弧线+伏笔+反转（参考 outline-methods.md「大纲三个维度结构法」 + emotional-arc-design.md「六种弧线速查」 + reversal-toolkit.md「反转类型」）
 - **追踪/伏笔.md** + **追踪/时间线.md** + **追踪/角色状态.md**：伏笔状态表+故事时间线+角色状态快照（参考 plot-core-methods.md「连续性追踪」、state-tracking.md「角色状态快照格式」）
 
 前 3 章细纲额外加载 [references/opening-design.md](references/opening-design.md)（黄金三章法则+六大标准）。

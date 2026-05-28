@@ -29,3 +29,15 @@ sync-source: skills/story-long-write/references/cross-book-recall.md
 | 大纲 | `章节/*_摘要.md` + `剧情/*.md` | `情节节点.md` + `写作手法.md` | ≤3 | ≤1 |
 | 模块 | `角色/` + `剧情/` + `设定/` | — | 1 本 | 0 |
 | 正文 | `文风.md` + 原文 | `写作手法.md` + 原文 | 0 | 0 |
+
+## 拆文字段 → 写作参考
+读 `_meta.json.structure_counts` 时，按此表回查对应写作 reference：
+
+| 拆文字段 | 含义 | 写作参考 |
+|---------|------|---------|
+| `beats` | 结构段（开端/发展/高潮/结局） | `genre-catalog.md` 题材结构 |
+| `hooks` | 钩子数 | `hooks-chapter.md` / `hooks-suspense.md` / `opening-design.md` |
+| `setup_clues` | 反转铺垫线索 | `reversal-toolkit.md` |
+| `character_archetypes` | 反差人物 | `character-design-methods.md` 三层标签反差 |
+| `reusable_structures` | 可复用手法 | `genre-writing-formulas.md` / `writing-craft.md` |
+| `reversal_type` | 反转类型（7 枚举） | `reversal-toolkit.md` 对应骨架 |
