@@ -166,14 +166,13 @@ demo/拆文库-盘龙/
 
 Agent 按需加载 `references/` 中的写作理论（角色设计、对话技法、反转工具箱等 100+ 份方法论文件），不预占上下文。
 
-## 升级到 v0.6.9
+## 升级到 v0.6.11
 
-如果你已经在写作项目中运行过 `/story-setup`，升级 skill 后请在项目根目录重新运行一次 `/story-setup`（hook bundle sentinel 升到 v9，触发模板重部署 + 部署完整性校验）。
+如果你已经在写作项目中运行过 `/story-setup`，升级 skill 后请在项目根目录重新运行一次 `/story-setup`（本次改了 agent-references 里的 `reversal-toolkit.md`，需重部署）。
 
-- **story-cover（封面生成）**：`images/edits` 流程改回标准的 `multipart/form-data`（原 JSON-with-URL 仅在某代理下生效，对 OpenAI 直连必失败）；自动版本号 `封面_v1/v2.png`、`.prompt.txt`/`.ref.txt` 旁注、`jq -n` 防转义、API 错误早退、`// empty` 防假 PNG、`BOOK_DIR/PROMPT` 入口校验，全面加固出图链路。删除与 `references/cover-styles.md` 漂移的平台风格副本表，统一以参考文件为单一来源；新增 Step 1.5 题材判定。
-- **browser-cdp（浏览器操控）**：杀掉用户 Chrome 前先走明确的同意握手——TTY 用 readline 询问，skill 模式以 `NEEDS_CONSENT` 退出码 3 回到 Claude Code 由 `AskUserQuestion` 询问，避免静默关闭浏览器丢失登录态；Profile 复制重新排序到 Chrome 退出之后，避免 SQLite 写锁导致 cookie 撕裂。
-- **story-review（多视角审查）**：模式预检 + Agent 缺失/异常/过旧/启动失败的安全 solo 回退，reference 不可读时走内置 rubric fallback；项目尚未 `story-setup` 也能跑出可用审稿。
-- **story-setup（环境部署）**：sentinel v9 元数据 + 项目内 reference 路径双重校验；新增 `scripts/check-story-setup-deployment.sh` / `check-hook-regex-sync.sh` 兜底回归；hook 包自包含化。
+- **拆文→写作打通（analyze ↔ write 契约）**：`story-short-analyze` 新增 `output-contract.md` 定义拆文产物的 `_meta.json` schema（含结构计数 `structure_counts`）+ Phase 7 门控验收（AI 腔自检 + 数值/枚举校验 + BLOCK 项扫描）。Phase 1 加字数探针（短/长篇路由）+ 断点续跑。
+- **多对标书跨书召回（cross-book-recall）**：拆解 ≥2 本书后，写新书时按需跨书检索相似范本——设定/大纲阶段召回结构与节奏，正文阶段只用主对标书。三道防线防笔法混与情节污染，跨题材相关度由 agent 自决，不维护索引文件。
+- **write references 内容整理**：`reversal-toolkit` 反转类型 5→7（补「认知反转」追妻/世情主力 +「无反转」甜宠/喜剧/报应型），与拆文 `reversal_type` 枚举对齐；`cross-book-recall` 加「拆文字段→写作参考」映射表；`narrative-units` 并入 `plot-emotion-system`，清理孤儿文件。
 
 ## 自动化 Hooks
 

@@ -164,14 +164,13 @@ Writing skills internally coordinate 7 specialized agents:
 
 Agents load writing theory from `references/` on demand (character design, dialogue techniques, twist toolbox, etc. — 100+ methodology files), without reserving context window space.
 
-## Upgrading to v0.6.9
+## Upgrading to v0.6.11
 
-If you have already run `/story-setup` inside a writing project, run `/story-setup` again from the project root after updating this skill pack (the hook-bundle sentinel is bumped to v9, triggering template redeploy plus deployment-integrity checks).
+If you have already run `/story-setup` inside a writing project, run `/story-setup` again from the project root after updating this skill pack (this release edits `reversal-toolkit.md` under agent-references, which needs redeploy).
 
-- **story-cover**: `images/edits` now uses the correct `multipart/form-data` shape (the previous JSON-with-URL shape only worked against a specific proxy quirk and would fail against OpenAI direct). Adds auto-versioned `封面_v1/v2.png` output, `.prompt.txt` / `.ref.txt` sidecars, `jq -n` JSON escaping, early-exit on API errors, `// empty` guard against fake PNGs, and `BOOK_DIR` / `PROMPT` entry checks. Drops the duplicated platform-style table that had drifted from `references/cover-styles.md`; adds deterministic Step 1.5 genre detection.
-- **browser-cdp**: explicit consent handshake before killing the user's Chrome — TTY uses readline; skill mode exits 3 with a `NEEDS_CONSENT` line so Claude Code can ask via `AskUserQuestion`. The profile copy is reordered to run **after** Chrome has exited, eliminating silent cookie corruption from copying SQLite files under a write lock.
-- **story-review**: mode preflight + safe solo fallback when reviewer agents are missing/broken/stale/fail-to-spawn, plus an embedded rubric fallback when reference files are unreadable; usable even before `story-setup` has been run in the project.
-- **story-setup**: sentinel v9 metadata and project-local reference paths are now double-checked; new `scripts/check-story-setup-deployment.sh` and `scripts/check-hook-regex-sync.sh` provide regression coverage; the deployed hook bundle is self-contained.
+- **analyze ↔ write contract**: `story-short-analyze` adds `output-contract.md` defining the deconstruction `_meta.json` schema (with `structure_counts`) plus a Phase 7 acceptance gate (AI-tone self-check + numeric/enum validation + BLOCK-item scan). Phase 1 gains a word-count probe (short/long routing) and crash-safe resume.
+- **cross-book recall**: once you've deconstructed ≥2 books, writing a new one pulls similar exemplars across books — structure/pacing during outline, main benchmark only during prose. Three guardrails prevent style-mixing and plot contamination; cross-genre relevance is judged by the agent, no index file maintained.
+- **write references cleanup**: `reversal-toolkit` goes 5→7 reversal types (adds 认知反转 for 追妻/世情, 无反转 for sweet/comedy/karma genres), aligned with the analyze `reversal_type` enum; `cross-book-recall` adds a "deconstruction field → writing reference" mapping table; `narrative-units` is merged into `plot-emotion-system` and an orphan file removed.
 
 ## Automation Hooks
 
