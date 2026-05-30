@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.6.13
+
+> write skill references 一致性修复 + 抽象概念可落地化（补真实网文例子 / 删黑话比喻）+ 同 skill 去重（指针化）+ agent 模板枚举漂移修复
+
+### 改进
+
+- **抽象概念可落地化**：两个 write skill 的理论 reference 把「只有定义没法照着写」的元概念补上具体网文例子或删掉空话——plot-emotion-system 提炼层级补「追妻文逐级抽象 + 换壳」贯穿例；plot-frameworks 故事构型补「萧炎打脸」例 + 小说四维自检改通俗四项 + 螺旋并线补可操作定义；style-commercial-theory（已改名）艺术化/极端化/代偿/观念错位/套路五写各补例；plot-core-methods 信息团 / 谜语人vs伏笔 / 升级三维度 / 金手指升华 补判据与例；emotional-arc-design 删「故事 = 情绪 × 世界」玄学公式、改三层情绪例；outline-structure-theory 选幕依据从悲剧体裁术语改按题材、删根/干/枝比喻列与八条线 placeholder；style-craft 删写意/神韵审美黑话；short genre-* 补基调自查/恋爱磨合/跨题材融合例并删修仙三境界等口号。
+- **一致性修复**：短篇反转信息差阈值统一为 writing-workflow 三档（villain-and-reveal 改指针）；对话占比统一 45-65%（genre-writing-techniques 两处）；workflow-revision Step3 编号修复；SKILL 横切表 anti-ai-writing 括注改真实小节名 + 补「对话」行；long SKILL 两处锚点名对齐正文。
+- **同 skill 去重（指针化）**：权力博弈对话（writing-craft→dialogue-mastery）、角色状态模板（artifact-protocols→state-tracking）、五幕式（plot-frameworks→outline-structure-theory）、阵营手牌法（plot-frameworks→plot-special-topics）各定单一真相源 + 同 skill 内指针，删重复块（净减约 130 行），不跨 skill 引用。
+- **命名去误导**：`style-commercial-theory.md` → `commercial-core-methods.md`（全文讲卖点/商业策略不讲文风）；`format-and-structure.md` 标题「短篇格式规范」→「正文格式与小节结构」（承载全体裁通用排版硬规则，4 副本同步）。
+- **F1 地图分层**：plot-core-methods 点明「新手村四势力（全量框架）vs 换地图三势力（精简版）」是分层而非矛盾，并提示换地图别丢变现/资源闭环渠道（3 副本同步）。
+- **opening-design 短篇适配**：short SKILL 路由处注明「前3章」读作开篇首节~前1/3、七步法按目标字数等比缩放（不改字节锁定的 opening-design 本体）。
+
+### Bug 修复
+
+- **agent 模板枚举漂移**：story-architect 误导技巧「情感引导」→「情绪引导」、反转类型 5→7 补「认知/无反转」（与 reversal-toolkit 及拆文 `_meta.json.reversal_type` 契约对齐）；character-designer 关系命名「结盟型/权力型」→「联盟型/权威型」（与 character-relations 对齐）。
+
+### 说明
+
+- 同名共享文件改动均按 `check-shared-files.sh` 字节同步到全部副本；三道守卫（check-shared-files / static-check / check-story-setup-deployment）全绿。
+- 暂缓项（需后续单独定方向）：`check-shared-files.sh` IGNORE 逻辑细化（character-* 在 write 侧已字节相同却被整体豁免，应改「按 skill 对」豁免，分类清单已备）、agent 模板少数 canonical-conflict 枚举（章首钩子7式 / 情绪弧线6种 / 语言风格5vs7维 / 对话权力模式）、agent 模板薄索引去重。
+
 ## v0.6.12
 
 > 选题决策（开方）：扫榜→可行性判断→爆款原因假设→拆文回填 · references 按主题索引 + 检索可验证 · 女频长篇 playbook · 术语白话化（去自造比喻）· 工程守卫（CI 增检查 + 采集脚本健壮性）
